@@ -1,0 +1,1003 @@
+[
+  {
+    "text": "I'll send you the deck by Friday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Friday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll have the report ready by end of day tomorrow",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "end of day tomorrow",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Let me follow up with the team and get back to you by Monday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Monday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I will send the invoice to accounting today",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "today",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll review the PR and leave comments by tomorrow morning",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow morning",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll schedule the meeting for next week and send you the invite",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next week",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Will deliver the mockups by Wednesday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Wednesday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll loop in the legal team and follow up with their feedback",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Let me look into this and report back tomorrow morning",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow morning",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I will update the documentation before the release",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll push the fix to staging by EOD",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "EOD",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll make sure to include the edge cases in the test suite",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll draft the proposal and share it with you by Thursday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Thursday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Will send over the contract for your review by end of week",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "end of week",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll handle the deployment this afternoon",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "this afternoon",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll get back to you on pricing by close of business",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "close of business",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I will run the analysis and share results next Monday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next Monday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll set up the staging environment before our next meeting",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Will share my notes from the call by tomorrow",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll confirm the budget numbers and send them over",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll get Sarah to send the report",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "I'll have Mike from engineering look into this and get back to you",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "I'll ask the design team to prepare a prototype by Friday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Friday",
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "I'll have my assistant schedule the demo for you",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "Let me get our ops team to provision the server for you",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "If the budget is approved, I will start next Monday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next Monday",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "Once we get sign-off from legal, I'll send the contract",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "If the tests pass, I'll deploy to production tonight",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tonight",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "Assuming the data migration goes well, I'll have the new dashboard ready by Wednesday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Wednesday",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "If we can get the API key from the vendor, I'll integrate it this week",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "this week",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "I'll send you a weekly update every Monday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "every Monday",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I'll check in with the client every Friday afternoon",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "every Friday",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I'll run the backup script every night before midnight",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "every night",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I'll send a monthly summary report on the first of each month",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "first of each month",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I'll do a daily standup update in the Slack channel",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "daily",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I could probably get this done by Friday if things go well",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I might be able to look into this next week, no promises though",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Maybe I'll have time to get to this if the sprint finishes early",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I should probably update the docs at some point",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I would if I could, but my plate is full right now",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "It would be nice to refactor that module eventually",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I was thinking about maybe taking a look at this",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "We'll circle back on this",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "We should probably address this at some point",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "The team will need to discuss this further",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Someone from the team should follow up on this",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "We need to figure this out as a group",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Let's revisit this as a team next quarter",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Thanks for sending that over Friday",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "She mentioned she already submitted the form yesterday",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I finished the migration last night, all good now",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "He delivered the presentation earlier today, it went well",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "The update was pushed to production this morning",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "We already addressed that in last week's patch",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Sure, I'll get right on that 🙄",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Oh yeah, I'll definitely have that done by yesterday 😂",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Right, because I have nothing else to do but work on this 🙃",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll just magically make more hours in the day then",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Thanks, sounds good!",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Got it, thanks for the update",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Looks great, no feedback from me",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "👍",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Perfect, that works for me",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Acknowledged, thanks",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Can you send me the report by Friday?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Could you look into this issue when you get a chance?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Would you be able to review the PR before Wednesday?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Please make sure to update the changelog before the release",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "The meeting is scheduled for 3pm on Thursday",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "The deadline for submissions is October 15th",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "FYI the server will be down for maintenance this weekend",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Here's the latest version of the budget spreadsheet",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Just a reminder that the all-hands is tomorrow at 10am",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "> I'll send you the deck by Friday\n\nSounds good, looking forward to it!",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "On Oct 14, John wrote:\n> I'll follow up with the vendor tomorrow\n\nThanks John, appreciated",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Forwarding this — she said she'd handle the vendor outreach by next week",
+    "is_commitment": true,
+    "correct_committer": "third_party",
+    "correct_deadline": "next week",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "As discussed in Slack, I'll send the updated requirements doc by Thursday. Also, I'll make sure to include the API changes we talked about.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Thursday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll look into the performance issue and let you know what I find. If it's a quick fix, I'll push it today. Otherwise, I'll give you an estimate tomorrow.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "Actually, can we push the deadline to next Tuesday instead? I need a few more days to test the edge cases.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next Tuesday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Sorry for the delay — I'll have the final version to you by end of day Wednesday at the latest",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "end of day Wednesday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "No worries, take your time. Just keep me posted on progress.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Happy Friday everyone! 🎉",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Hey team, just wanted to share that we hit our Q3 targets!",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Does anyone know if the office will be open on Monday?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Great discussion today. I think we're aligned on the approach.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I promise I'll never let this happen again",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll try my best to get this done but honestly I'm swamped",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I think someone mentioned they'd handle the catering for the event",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Would it be possible to move the deadline to next month? If so, I can definitely deliver a more polished version.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll ping the DevOps channel and ask them to look into the memory leak. Should have an answer by tomorrow.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow",
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "Per our call — I'll send you the signed NDA by end of business today, and then I'll follow up with the technical proposal by Friday.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Friday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Hi all, friendly reminder to submit your time sheets by 5pm today. I'll compile the report afterward and send it to HR.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "today",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll create a shared doc and add everyone's feedback before the next sprint planning session",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Just finished the design review. Everything looks good. Will send final sign-off by EOD.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "EOD",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I had a thought about how to improve the onboarding flow — let me prototype something and show you next week",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next week",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll write up the post-mortem and share it with the team by Monday. Lessons learned from this outage.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Monday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Let me check with finance about the budget allocation. If they approve, I'll wire the deposit by end of month.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "end of month",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "I'll coordinate with the QA team to run the full regression suite before we cut the release. Expecting results by Thursday.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Thursday",
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "If the client confirms the scope change, I'll revise the timeline and send you an updated project plan by Friday.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Friday",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "Hmm, that's an interesting idea. Let me think about it.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I need to check my calendar first. Not sure if I can make it work this week.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "cc @sarah @mike — please review when you get a chance",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Following up on my earlier message — any updates on the vendor contract?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Bumping this thread — still waiting on the API documentation",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll be OOO next week. Back on the 21st.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Not sure this is the right approach. Maybe we should reconsider.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Will definitely circle back to this. Eventually. Probably.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "In theory, we should have this wrapped up by the end of the quarter",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Ideally I'd like to ship this by next sprint, but we'll see how it goes",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll confirm the venue reservation and send everyone the details by Wednesday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Wednesday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Let me migrate the data to the new schema this weekend. I'll have it done before Monday standup.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Monday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll prepare the quarterly business review slides and book time with the leadership team for next Thursday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next Thursday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll sort out the CI/CD pipeline configuration. Expect it to be working by end of tomorrow.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "end of tomorrow",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Once I hear back from the insurance company, I'll forward you the policy documents",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "I'll have our analyst pull the numbers and share a summary with the board by Friday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Friday",
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "We should probably update the API docs. Not sure who's responsible for that though.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "It's on my radar but I can't commit to a timeline right now",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Just wanted to say thanks for all the hard work on this project!",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll file the bug report in Jira and assign it to the backend team for triage",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll clean up the test data in the staging database tonight after hours",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tonight",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll reach out to the client and reschedule the demo for sometime next week",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next week",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "The quarterly numbers look solid. Here's the summary: revenue up 15%, churn down 3%.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "lol ok 'I'll totally have it done by Friday' said every PM ever",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "As per my last email... I'll resend the attachment since it seems you didn't receive it",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll do a bi-weekly sync with the offshore team going forward",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "bi-weekly",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "If we can secure the additional headcount, I'll spin up a dedicated team for this initiative by Q2",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "Q2",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "I think we may need to revisit the architecture, but that's a discussion for another day",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Sounds like a plan. Let me know if there's anything else I can help with.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll update the runbook with the new deployment procedure before anyone else has to do an on-call rotation",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Let me grab the latest metrics from Datadog and compile a dashboard. Should be ready by tomorrow afternoon.",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "tomorrow afternoon",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Sure, I'll get right on that 🙄",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Oh yeah, I'll DEFINITELY have that done by yesterday",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Right, because I have nothing else to do. I'll get right on it.",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "Sounds good.\n\nOn Oct 14, 2025, John wrote:\n> I'll send you the report by Friday",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I'll handle this.\n\n---------- Forwarded message ----------\nFrom: Sarah\nI will send the deck by Monday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "simple"
+  },
+  {
+    "text": "Actually, can we push the deck to next Wednesday instead?",
+    "is_commitment": false,
+    "correct_committer": null,
+    "correct_deadline": null,
+    "commitment_type": null
+  },
+  {
+    "text": "I need a bit more time — I'll have it by next Friday instead of this Friday",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next Friday",
+    "commitment_type": "simple"
+  },
+  {
+    "text": "I'll send you a weekly status update every Monday morning",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "every Monday morning",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "I'll ping you every Friday with the metrics report",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "every Friday",
+    "commitment_type": "recurring"
+  },
+  {
+    "text": "If the budget gets approved, I'll start hiring next week",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": "next week",
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "Once we get the green light from legal, I will proceed with the contract",
+    "is_commitment": true,
+    "correct_committer": "sender",
+    "correct_deadline": null,
+    "commitment_type": "conditional"
+  },
+  {
+    "text": "I'll get Sarah to send you the designs by Thursday",
+    "is_commitment": true,
+    "correct_committer": "Sarah",
+    "correct_deadline": "Thursday",
+    "commitment_type": "delegated"
+  },
+  {
+    "text": "I'll have my assistant schedule a meeting for next week",
+    "is_commitment": true,
+    "correct_committer": "assistant",
+    "correct_deadline": "next week",
+    "commitment_type": "delegated"
+  }
+]
