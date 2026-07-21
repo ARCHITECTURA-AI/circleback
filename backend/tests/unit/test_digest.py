@@ -117,3 +117,23 @@ class TestDigestAndCorrection:
         events = res_events.scalars().all()
         assert len(events) > 0
         assert events[-1].type == CommitmentEventType.RENEGOTIATED
+
+    @pytest.mark.asyncio
+    async def test_digest_updates_status_for_silent_threads(self, db_session) -> None:
+        """Generating digest updates commitment status to AT_RISK or OVERDUE even without new messages."""
+        near_deadline = datetime.now(timezone.utc) + timedelta(hours=2)
+        c = make_commitment(
+            status=CommitmentStatus.OPEN,
+            direction=CommitmentDirection.MADE_BY_USER,
+        )
+        c.resolved_deadline = near_deadline
+        db_session.add(c)
+        await db_session.commit()
+
+        digest = await generate_digest(db_session, user_id=MOCK_USER_ID)
+
+        await db_session.refresh(c)
+        assert c.status == CommitmentStatus.AT_RISK
+        assert len(digest["made_by_user"]) >= 1
+        assert digest["made_by_user"][0]["status"] == "at_risk"
+

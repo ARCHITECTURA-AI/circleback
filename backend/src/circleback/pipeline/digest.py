@@ -44,6 +44,12 @@ async def generate_digest(db: AsyncSession, user_id: str | None = None) -> dict[
     Framing is deliberate: lead with upcoming (at_risk), then open items,
     then overdue — not the other way around (spec §6.8).
     """
+    from circleback.config import get_settings
+    from circleback.pipeline.status import update_commitment_statuses
+
+    at_risk_hours = get_settings().at_risk_hours_before_deadline
+    await update_commitment_statuses(db, at_risk_hours=at_risk_hours, user_id=user_id)
+
     result = await db.execute(
         select(Commitment).where(
             Commitment.status.in_([

@@ -256,10 +256,12 @@ def compile_digest_graph(checkpointer: Any | None = None) -> Any:
     """Compile and return the LangGraph digest/correction pipeline state machine."""
     workflow = StateGraph(PipelineState)
 
+    workflow.add_node("status", status_node)
     workflow.add_node("digest", digest_node)
     workflow.add_node("correction", correction_node)
 
-    workflow.add_edge(START, "digest")
+    workflow.add_edge(START, "status")
+    workflow.add_edge("status", "digest")
     workflow.add_edge("digest", "correction")
     workflow.add_edge("correction", END)
 
