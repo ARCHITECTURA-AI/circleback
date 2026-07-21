@@ -80,6 +80,16 @@ class Settings(BaseSettings):
         description="Hours before deadline to transition commitment to at_risk",
     )
 
+    # ── Digest Scheduler ──────────────────────────────────────
+    enable_digest_scheduler: bool = Field(
+        default=False,
+        description="Enable periodic digest generation via APScheduler",
+    )
+    digest_schedule_cron: str = Field(
+        default="0 8 * * *",
+        description="Cron expression for digest schedule (default: daily at 8 AM)",
+    )
+
 
 def get_settings() -> Settings:
     """Create and return a Settings instance.

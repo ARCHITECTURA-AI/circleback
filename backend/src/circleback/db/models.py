@@ -232,6 +232,9 @@ class Message(Base):
     """
 
     __tablename__ = "messages"
+    __table_args__ = (
+        UniqueConstraint("user_id", "external_message_id", name="uq_user_external_message"),
+    )
 
     id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
@@ -250,7 +253,7 @@ class Message(Base):
     external_message_id: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
-        unique=True,
+        unique=False,
         index=True,
         doc="Original Gmail message ID or Slack message ts",
     )

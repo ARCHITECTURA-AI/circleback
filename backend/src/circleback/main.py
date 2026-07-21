@@ -80,6 +80,18 @@ def _is_rate_limited(client_ip: str) -> bool:
 # ── App Factory ───────────────────────────────────────────────
 
 
+from contextlib import asynccontextmanager
+from collections.abc import AsyncGenerator
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Application lifespan: start optional scheduler on startup, clean up on shutdown."""
+    from circleback.scheduler import start_scheduler
+    start_scheduler()
+    yield
+
+
 def create_app() -> FastAPI:
     """Application factory — creates and configures the FastAPI app."""
     settings = get_settings()
@@ -92,6 +104,7 @@ def create_app() -> FastAPI:
             "yours and others' — and surfaces what's at risk before it becomes a broken promise."
         ),
         version="0.1.0",
+        lifespan=lifespan,
     )
 
     # ── CORS ──────────────────────────────────────────────────

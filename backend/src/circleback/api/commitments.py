@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 import logging
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -274,9 +274,9 @@ async def get_commitment_detail(
 
 import time
 
-# Module-level metrics cache (Phase 4)
-_metrics_cache: dict[str, Any] = {}
-_metrics_cache_timestamp: float = 0.0
+# Module-level metrics cache keyed by user_id (Phase 4)
+_metrics_cache: dict[str, dict[str, Any]] = {}
+_metrics_cache_timestamps: dict[str, float] = {}
 _METRICS_CACHE_TTL = 3600  # 1 hour cache TTL
 
 
@@ -286,12 +286,12 @@ async def get_metrics(
     user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Retrieve scores computed by the evaluation harness from cache."""
-    global _metrics_cache, _metrics_cache_timestamp
+    uid = user["user_id"]
     now = time.time()
     
-    # Return cache if valid
-    if _metrics_cache and (now - _metrics_cache_timestamp) < _METRICS_CACHE_TTL:
-        return _metrics_cache
+    # Return cache if valid for this user
+    if uid in _metrics_cache and (now - _metrics_cache_timestamps.get(uid, 0)) < _METRICS_CACHE_TTL:
+        return _metrics_cache[uid]
         
     return {
         "status": "no_cached_results",
@@ -299,21 +299,34 @@ async def get_metrics(
     }
 
 
+def _run_evaluation_sync(user_id: str) -> None:
+    """Run evaluation in background and cache results."""
+    import asyncio
+    from circleback.db import async_session_factory
+
+    async def _inner() -> None:
+        async with async_session_factory() as db:
+            try:
+                metrics = await run_evaluation(db, limit=50, user_id=user_id)
+                _metrics_cache[user_id] = metrics
+                _metrics_cache_timestamps[user_id] = time.time()
+                await db.commit()
+            except Exception:
+                await db.rollback()
+
+    asyncio.run(_inner())
+
+
 @router.post("/metrics/refresh")
 async def refresh_metrics(
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
-    """Explicitly re-run evaluation harness and cache the results."""
-    global _metrics_cache, _metrics_cache_timestamp
-    try:
-        # Run evaluation on the first 50 fixtures
-        metrics = await run_evaluation(db, limit=50)
-        _metrics_cache = metrics
-        _metrics_cache_timestamp = time.time()
-        return metrics
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """Queue evaluation harness to run in background and cache the results."""
+    uid = user["user_id"]
+    background_tasks.add_task(_run_evaluation_sync, uid)
+    return {"status": "running", "message": "Metrics refresh queued. Poll GET /api/v1/metrics for results."}
 
 
 @router.post("/digest/generate")

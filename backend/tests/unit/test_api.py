@@ -212,13 +212,12 @@ class TestExtendedAPI:
 
     @patch("circleback.pipeline.extractor.call_llm_for_extraction")
     async def test_get_metrics_endpoint(self, mock_call_llm, client: AsyncClient) -> None:
-        """GET /api/v1/metrics returns current evaluation harness scores."""
+        """GET /api/v1/metrics returns cache status when no cached results exist."""
         mock_call_llm.return_value = {
             "commitments": []
         }
         response = await client.get("/api/v1/metrics")
         assert response.status_code == 200
         data = response.json()
-        assert "precision" in data
-        assert "recall" in data
-        assert "f1" in data
+        assert "status" in data
+        assert data["status"] == "no_cached_results"

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timezone
+from typing import Any
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -257,7 +258,9 @@ async def slack_callback(
                     display_name = slack_user.get("real_name") or slack_user.get("name")
 
     if not email and slack_user_id:
-        email = f"{slack_user_id}@slack.com"
+        # Use a synthetic internal-only email to avoid collision with real Google accounts.
+        # "@circleback.internal" is not a real domain and can never match a Google OAuth email.
+        email = f"slack+{slack_user_id}@circleback.internal"
         display_name = slack_user_id
 
     if not email:
