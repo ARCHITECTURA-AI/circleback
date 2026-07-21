@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, Response
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db import get_db
@@ -54,21 +54,32 @@ async def delete_all_user_data(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, str]:
-    """Absolutely delete all user-related data in the database.
+    """Absolutely delete all user-related data in the database for the current user.
 
     This is the "disconnect and delete my data" action from spec §10.
     It purges stored tokens AND all derived data — not just a soft delete.
     Deletion order respects foreign key constraints.
     """
+    from circleback.db.models import User
+
+    user_id = user["user_id"]
+
     # Delete in dependency order (children first)
-    await db.execute(delete(CommitmentEvent))
-    await db.execute(delete(EvalLabel))
-    await db.execute(delete(Commitment))
-    await db.execute(delete(UnrecognizedSender))
-    await db.execute(delete(Message))
-    await db.execute(delete(Thread))
-    await db.execute(delete(Person))
-    await db.execute(delete(OAuthToken))
+    await db.execute(
+        delete(CommitmentEvent).where(
+            CommitmentEvent.commitment_id.in_(
+                select(Commitment.id).where(Commitment.user_id == user_id)
+            )
+        )
+    )
+    await db.execute(delete(EvalLabel).where(EvalLabel.user_id == user_id))
+    await db.execute(delete(Commitment).where(Commitment.user_id == user_id))
+    await db.execute(delete(UnrecognizedSender).where(UnrecognizedSender.user_id == user_id))
+    await db.execute(delete(Message).where(Message.user_id == user_id))
+    await db.execute(delete(Thread).where(Thread.user_id == user_id))
+    await db.execute(delete(Person).where(Person.user_id == user_id))
+    await db.execute(delete(OAuthToken).where(OAuthToken.user_id == user_id))
+    await db.execute(delete(User).where(User.id == user_id))
 
     await db.flush()
 

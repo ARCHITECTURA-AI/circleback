@@ -30,11 +30,12 @@ async def sync_slack_channel(
     db: AsyncSession,
     channel_id: str,
     token: str,
+    user_id: str,
 ) -> None:
     """Sync full history of a Slack channel using cursor pagination."""
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True))
+    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 
@@ -59,17 +60,18 @@ async def sync_slack_channel(
                 continue
 
             # Check if message already exists
-            res = await db.execute(select(Message).where(Message.external_message_id == ts))
+            res = await db.execute(select(Message).where(Message.external_message_id == ts, Message.user_id == user_id))
             existing_msg = res.scalar_one_or_none()
 
             normalized = normalize_slack_message(raw_msg)
             normalized.external_message_id = ts
+            normalized.user_id = user_id
 
             if not existing_msg:
                 db.add(normalized)
                 await db.flush()
                 # Run pipeline for new message
-                await run_pipeline_for_message(db, normalized.id, external_thread_id=normalized.thread_id, self_email=self_email)
+                await run_pipeline_for_message(db, normalized.id, user_id=user_id, external_thread_id=normalized.thread_id, self_email=self_email)
 
         await db.flush()
 
@@ -78,11 +80,11 @@ async def sync_slack_channel(
             break
 
 
-async def handle_slack_event(db: AsyncSession, event: dict[str, Any]) -> None:
+async def handle_slack_event(db: AsyncSession, event: dict[str, Any], user_id: str) -> None:
     """Process a real-time event from the Slack Events API."""
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True))
+    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 
@@ -99,25 +101,25 @@ async def handle_slack_event(db: AsyncSession, event: dict[str, Any]) -> None:
         ts = sub_msg.get("ts")
         text = sub_msg.get("text", "")
         if ts:
-            res = await db.execute(select(Message).where(Message.external_message_id == ts))
+            res = await db.execute(select(Message).where(Message.external_message_id == ts, Message.user_id == user_id))
             msg = res.scalar_one_or_none()
             if msg:
                 msg.raw_text = text
                 msg.edited_at = datetime.now(timezone.utc)
                 await db.flush()
                 # Run pipeline for edited message
-                await run_pipeline_for_message(db, msg.id, self_email=self_email)
+                await run_pipeline_for_message(db, msg.id, user_id=user_id, self_email=self_email)
 
     elif subtype == "message_deleted":
         deleted_ts = event.get("deleted_ts")
         if deleted_ts:
-            res = await db.execute(select(Message).where(Message.external_message_id == deleted_ts))
+            res = await db.execute(select(Message).where(Message.external_message_id == deleted_ts, Message.user_id == user_id))
             msg = res.scalar_one_or_none()
             if msg:
                 msg.deleted_at = datetime.now(timezone.utc)
 
                 # Create RETRACTED_SOURCE CommitmentEvent for all linked commitments
-                c_res = await db.execute(select(Commitment).where(Commitment.source_message_id == msg.id))
+                c_res = await db.execute(select(Commitment).where(Commitment.source_message_id == msg.id, Commitment.user_id == user_id))
                 commitments = c_res.scalars().all()
                 for commitment in commitments:
                     event_record = CommitmentEvent(
@@ -132,12 +134,13 @@ async def handle_slack_event(db: AsyncSession, event: dict[str, Any]) -> None:
         # Standard new message event
         ts = event.get("ts")
         if ts:
-            res = await db.execute(select(Message).where(Message.external_message_id == ts))
+            res = await db.execute(select(Message).where(Message.external_message_id == ts, Message.user_id == user_id))
             existing = res.scalar_one_or_none()
             if not existing:
                 normalized = normalize_slack_message(event)
                 normalized.external_message_id = ts
+                normalized.user_id = user_id
                 db.add(normalized)
                 await db.flush()
                 # Run pipeline for new message
-                await run_pipeline_for_message(db, normalized.id, external_thread_id=normalized.thread_id, self_email=self_email)
+                await run_pipeline_for_message(db, normalized.id, user_id=user_id, external_thread_id=normalized.thread_id, self_email=self_email)

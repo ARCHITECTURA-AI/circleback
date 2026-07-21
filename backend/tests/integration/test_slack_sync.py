@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 
 from circleback.db.models import ChannelType, Message
 from circleback.ingestion.slack import handle_slack_event, sync_slack_channel
-from tests.conftest import make_message
+from tests.conftest import make_message, MOCK_USER_ID
 
 
 class TestSlackIngestion:
@@ -45,7 +45,7 @@ class TestSlackIngestion:
             }
         ]
 
-        await sync_slack_channel(db_session, channel_id="C99999", token="xoxb-test")
+        await sync_slack_channel(db_session, "C99999", "xoxb-test", MOCK_USER_ID)
 
         # Verify it was called twice, once with no cursor and once with cursor_abc
         assert mock_client.conversations_history.call_count == 2
@@ -84,7 +84,7 @@ class TestSlackIngestion:
             "ts": "1710000005.000000"
         }
 
-        await handle_slack_event(db_session, event)
+        await handle_slack_event(db_session, event, MOCK_USER_ID)
 
         await db_session.refresh(msg)
         assert msg.raw_text == "Hello Edited"
@@ -110,7 +110,7 @@ class TestSlackIngestion:
             "ts": "1710000010.000000"
         }
 
-        await handle_slack_event(db_session, event)
+        await handle_slack_event(db_session, event, MOCK_USER_ID)
 
         await db_session.refresh(msg)
         assert msg.deleted_at is not None

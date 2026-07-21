@@ -31,6 +31,7 @@ from tests.conftest import (
     make_commitment_event,
     make_message,
     make_person,
+    MOCK_USER_ID,
 )
 
 
@@ -331,6 +332,7 @@ class TestThreadModel:
     async def test_thread_create(self, db_session: AsyncSession) -> None:
         """Thread can be created with channel and subject."""
         thread = Thread(
+            user_id=MOCK_USER_ID,
             channel=ChannelType.EMAIL,
             subject_or_topic="Q3 Budget Review",
             external_thread_id="gmail_thread_123",
@@ -349,7 +351,7 @@ class TestThreadModel:
         self, db_session: AsyncSession
     ) -> None:
         """Messages can be linked to a thread."""
-        thread = Thread(channel=ChannelType.SLACK)
+        thread = Thread(user_id=MOCK_USER_ID, channel=ChannelType.SLACK)
         db_session.add(thread)
         await db_session.flush()
 
@@ -378,6 +380,7 @@ class TestEvalLabelModel:
         await db_session.flush()
 
         label = EvalLabel(
+            user_id=MOCK_USER_ID,
             message_id=msg.id,
             is_commitment=True,
             correct_committer="alice@company.com",

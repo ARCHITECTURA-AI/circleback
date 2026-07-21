@@ -46,8 +46,13 @@ def create_session(response: Response, user_data: dict[str, Any]) -> None:
 
     Args:
         response: The FastAPI Response to set the cookie on.
-        user_data: Session payload, e.g. ``{"provider": "google", "email": "..."}``
+        user_data: Session payload, e.g. ``{"provider": "google", "email": "...", "user_id": "..."}``
     """
+    from circleback.config import get_settings
+
+    settings = get_settings()
+    is_secure = not settings.debug and settings.base_url.startswith("https://")
+
     user_data["authenticated_at"] = datetime.now(timezone.utc).isoformat()
     signer = _get_signer()
     payload = json.dumps(user_data)
@@ -59,7 +64,7 @@ def create_session(response: Response, user_data: dict[str, Any]) -> None:
         max_age=SESSION_MAX_AGE_SECONDS,
         httponly=True,
         samesite="lax",
-        secure=False,  # Set to True when using HTTPS in production
+        secure=is_secure,
     )
     logger.info("Session created for provider=%s", user_data.get("provider"))
 

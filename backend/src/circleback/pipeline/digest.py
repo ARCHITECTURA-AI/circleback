@@ -38,8 +38,8 @@ def _commitment_sort_key(c_dict: dict[str, Any]) -> str:
     return f"{prefix}_{deadline}"
 
 
-async def generate_digest(db: AsyncSession) -> dict[str, list[dict[str, Any]]]:
-    """Compile active commitments into grouped outbound/inbound lists.
+async def generate_digest(db: AsyncSession, user_id: str | None = None) -> dict[str, list[dict[str, Any]]]:
+    """Compile active commitments into grouped outbound/inbound lists for a specific user.
 
     Framing is deliberate: lead with upcoming (at_risk), then open items,
     then overdue — not the other way around (spec §6.8).
@@ -52,7 +52,8 @@ async def generate_digest(db: AsyncSession) -> dict[str, list[dict[str, Any]]]:
                 CommitmentStatus.OVERDUE,
                 CommitmentStatus.RENEGOTIATED,
                 CommitmentStatus.NEEDS_CLARIFICATION,
-            ])
+            ]),
+            Commitment.user_id == user_id
         )
     )
     commitments = result.scalars().all()
@@ -95,6 +96,7 @@ async def apply_commitment_correction(
     commitment_id: str,
     action: str,
     params: dict[str, Any] | None = None,
+    user_id: str | None = None,
 ) -> None:
     """Apply a manual user correction to a commitment.
 
@@ -107,7 +109,12 @@ async def apply_commitment_correction(
     - "dismiss": Not actually a commitment
     - "new_deadline": Renegotiate with a new deadline
     """
-    result = await db.execute(select(Commitment).where(Commitment.id == commitment_id))
+    result = await db.execute(
+        select(Commitment).where(
+            Commitment.id == commitment_id,
+            Commitment.user_id == user_id
+        )
+    )
     commitment = result.scalar_one_or_none()
     if not commitment:
         raise ValueError(f"Commitment with ID {commitment_id} not found.")
@@ -122,7 +129,7 @@ async def apply_commitment_correction(
         db.add(event)
 
         # Feed back into eval set — this was a real commitment
-        await _record_eval_feedback(db, commitment, is_commitment=True)
+        await _record_eval_feedback(db, commitment, is_commitment=True, user_id=user_id)
 
     elif action == "dismiss":
         commitment.status = CommitmentStatus.DISMISSED
@@ -134,7 +141,7 @@ async def apply_commitment_correction(
         db.add(event)
 
         # Feed back into eval set — this was NOT a real commitment (false positive)
-        await _record_eval_feedback(db, commitment, is_commitment=False)
+        await _record_eval_feedback(db, commitment, is_commitment=False, user_id=user_id)
 
     elif action == "new_deadline":
         commitment.status = CommitmentStatus.RENEGOTIATED
@@ -158,6 +165,7 @@ async def apply_commitment_correction(
         await _record_eval_feedback(
             db, commitment, is_commitment=True,
             correct_deadline=new_deadline_str,
+            user_id=user_id,
         )
 
     else:
@@ -171,6 +179,7 @@ async def _record_eval_feedback(
     commitment: Commitment,
     is_commitment: bool,
     correct_deadline: str | None = None,
+    user_id: str | None = None,
 ) -> None:
     """Record a user correction as a labeled data point in the eval set.
 
@@ -182,7 +191,10 @@ async def _record_eval_feedback(
 
     # Check if an eval label already exists for this message
     existing = await db.execute(
-        select(EvalLabel).where(EvalLabel.message_id == commitment.source_message_id)
+        select(EvalLabel).where(
+            EvalLabel.message_id == commitment.source_message_id,
+            EvalLabel.user_id == user_id
+        )
     )
     label = existing.scalar_one_or_none()
 
@@ -195,6 +207,7 @@ async def _record_eval_feedback(
     else:
         # Create new eval label from correction
         label = EvalLabel(
+            user_id=user_id,
             message_id=commitment.source_message_id,
             is_commitment=is_commitment,
             correct_committer=commitment.committer_person_id,

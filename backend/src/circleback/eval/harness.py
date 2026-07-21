@@ -32,7 +32,7 @@ def load_fixtures() -> list[dict[str, Any]]:
         return json.load(f)  # type: ignore[no-any-return]
 
 
-async def run_evaluation(db: AsyncSession, limit: int | None = None) -> dict[str, Any]:
+async def run_evaluation(db: AsyncSession, limit: int | None = None, user_id: str | None = None) -> dict[str, Any]:
     """Run extraction pipeline on labeled fixtures and return performance metrics.
 
     Returns comprehensive metrics including:
@@ -41,6 +41,22 @@ async def run_evaluation(db: AsyncSession, limit: int | None = None) -> dict[str
     - Type accuracy (when commitment is correctly detected)
     - Example successes and failures for honest reporting (spec §12)
     """
+    from circleback.db.models import User
+    from sqlalchemy import select
+
+    resolved_user_id = user_id
+    if not resolved_user_id:
+        # Check if any user exists, otherwise create one
+        result = await db.execute(select(User))
+        user_record = result.scalar_one_or_none()
+        if user_record:
+            resolved_user_id = user_record.id
+        else:
+            user_record = User(email="eval@company.com", display_name="Eval User")
+            db.add(user_record)
+            await db.flush()
+            resolved_user_id = user_record.id
+
     fixtures = load_fixtures()
     if limit is not None:
         fixtures = fixtures[:limit]
@@ -66,6 +82,7 @@ async def run_evaluation(db: AsyncSession, limit: int | None = None) -> dict[str
         from datetime import datetime, timezone
         msg = Message(
             id=f"eval_msg_{index}",
+            user_id=resolved_user_id,
             channel=ChannelType.EMAIL,
             raw_text=text,
             timestamp=datetime.now(timezone.utc),
@@ -78,7 +95,7 @@ async def run_evaluation(db: AsyncSession, limit: int | None = None) -> dict[str
         commitments = []
         if passed_prefilter:
             commitments = await extract_commitments_from_message(
-                db, msg, self_email="self@company.com"
+                db, msg, self_email="self@company.com", user_id=resolved_user_id
             )
 
         actual_commitment = len(commitments) > 0

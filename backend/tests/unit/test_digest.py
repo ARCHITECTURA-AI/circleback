@@ -17,7 +17,7 @@ from circleback.db.models import (
     CommitmentEvent,
 )
 from circleback.pipeline.digest import generate_digest, apply_commitment_correction
-from tests.conftest import make_commitment
+from tests.conftest import make_commitment, MOCK_USER_ID
 
 
 class TestDigestAndCorrection:
@@ -41,7 +41,7 @@ class TestDigestAndCorrection:
         db_session.add_all([c1, c2])
         await db_session.commit()
 
-        digest = await generate_digest(db_session)
+        digest = await generate_digest(db_session, user_id=MOCK_USER_ID)
         
         # Verify structure
         assert "made_by_user" in digest
@@ -56,7 +56,7 @@ class TestDigestAndCorrection:
         db_session.add(c)
         await db_session.commit()
 
-        await apply_commitment_correction(db_session, c.id, "done")
+        await apply_commitment_correction(db_session, c.id, "done", user_id=MOCK_USER_ID)
 
         await db_session.refresh(c)
         assert c.status == CommitmentStatus.FULFILLED
@@ -76,7 +76,7 @@ class TestDigestAndCorrection:
         db_session.add(c)
         await db_session.commit()
 
-        await apply_commitment_correction(db_session, c.id, "dismiss")
+        await apply_commitment_correction(db_session, c.id, "dismiss", user_id=MOCK_USER_ID)
 
         await db_session.refresh(c)
         assert c.status == CommitmentStatus.DISMISSED
@@ -101,7 +101,8 @@ class TestDigestAndCorrection:
             db_session,
             c.id,
             "new_deadline",
-            params={"new_deadline": new_deadline.isoformat()}
+            params={"new_deadline": new_deadline.isoformat()},
+            user_id=MOCK_USER_ID,
         )
 
         await db_session.refresh(c)

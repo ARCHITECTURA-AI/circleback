@@ -19,6 +19,7 @@ def mock_settings(monkeypatch):
         session_secret_key = "super_secret_test_key"
         base_url = "http://localhost:8000"
         frontend_url = "http://localhost:3000"
+        debug = False
     
     monkeypatch.setattr("circleback.config.get_settings", lambda: MockSettings())
     return MockSettings()

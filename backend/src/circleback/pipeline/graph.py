@@ -1,11 +1,8 @@
 """LangGraph pipeline definition and compilation.
 
-Implements the full pipeline from the technical specification as individual,
-independently-testable nodes in a StateGraph:
-
-  Ingestion → Prefilter → Extraction → Temporal Resolution
-     → Thread/Entity Linking → Fulfillment Matching → Status Engine
-     → Digest Generation
+Implements the split pipeline from the technical specification:
+- Ingestion graph (per-message, non-blocking)
+- Digest+Correction graph (scheduled or on-demand, with human-in-the-loop interrupt)
 
 Each node has explicit typed state in/out. The graph uses MemorySaver
 checkpointing for persistence across sessions.
@@ -43,6 +40,7 @@ class PipelineState(TypedDict):
     Each field is populated or updated by the corresponding node.
     """
 
+    user_id: str
     message_id: str
     external_thread_id: str | None
     self_email: str
@@ -62,9 +60,10 @@ async def prefilter_node(state: PipelineState, config: RunnableConfig) -> dict[s
     This avoids expensive LLM calls for messages that clearly contain no commitment language.
     """
     db: AsyncSession = config["configurable"]["db"]
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
     msg_id = state["message_id"]
 
-    result = await db.execute(select(Message).where(Message.id == msg_id))
+    result = await db.execute(select(Message).where(Message.id == msg_id, Message.user_id == user_id))
     msg = result.scalar_one_or_none()
 
     if not msg or msg.deleted_at is not None:
@@ -80,15 +79,16 @@ async def extract_node(state: PipelineState, config: RunnableConfig) -> dict[str
     Produces candidate Commitment objects with extraction_confidence scores.
     """
     db: AsyncSession = config["configurable"]["db"]
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
     msg_id = state["message_id"]
     self_email = state["self_email"]
 
-    result = await db.execute(select(Message).where(Message.id == msg_id))
+    result = await db.execute(select(Message).where(Message.id == msg_id, Message.user_id == user_id))
     msg = result.scalar_one_or_none()
     if not msg:
         return {"commitments_extracted": 0}
 
-    commitments = await extract_commitments_from_message(db, msg, self_email=self_email)
+    commitments = await extract_commitments_from_message(db, msg, self_email=self_email, user_id=user_id)
     return {"commitments_extracted": len(commitments)}
 
 
@@ -98,9 +98,10 @@ async def temporal_node(state: PipelineState, config: RunnableConfig) -> dict[st
     Anchors against message send timestamp with explicit timezone/business-day policy.
     """
     db: AsyncSession = config["configurable"]["db"]
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
     msg_id = state["message_id"]
 
-    result = await db.execute(select(Message).where(Message.id == msg_id))
+    result = await db.execute(select(Message).where(Message.id == msg_id, Message.user_id == user_id))
     msg = result.scalar_one_or_none()
     if not msg:
         return {}
@@ -108,7 +109,10 @@ async def temporal_node(state: PipelineState, config: RunnableConfig) -> dict[st
     # Find commitments from this message that need temporal resolution
     from circleback.db.models import Commitment
     c_result = await db.execute(
-        select(Commitment).where(Commitment.source_message_id == msg_id)
+        select(Commitment).where(
+            Commitment.source_message_id == msg_id,
+            Commitment.user_id == user_id
+        )
     )
     commitments = c_result.scalars().all()
 
@@ -133,15 +137,16 @@ async def link_node(state: PipelineState, config: RunnableConfig) -> dict[str, A
     Maps sender handles to Person records using the manual seed list.
     """
     db: AsyncSession = config["configurable"]["db"]
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
     msg_id = state["message_id"]
     ext_thread_id = state.get("external_thread_id")
 
-    result = await db.execute(select(Message).where(Message.id == msg_id))
+    result = await db.execute(select(Message).where(Message.id == msg_id, Message.user_id == user_id))
     msg = result.scalar_one_or_none()
     if not msg:
         return {}
 
-    await link_thread_and_entities(db, msg, external_thread_id=ext_thread_id)
+    await link_thread_and_entities(db, msg, external_thread_id=ext_thread_id, user_id=user_id)
     return {}
 
 
@@ -151,14 +156,15 @@ async def fulfill_node(state: PipelineState, config: RunnableConfig) -> dict[str
     Handles fulfillment, renegotiation, and delegation independently.
     """
     db: AsyncSession = config["configurable"]["db"]
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
     msg_id = state["message_id"]
 
-    result = await db.execute(select(Message).where(Message.id == msg_id))
+    result = await db.execute(select(Message).where(Message.id == msg_id, Message.user_id == user_id))
     msg = result.scalar_one_or_none()
     if not msg or not msg.thread_id:
         return {}
 
-    await process_thread_fulfillment(db, msg.thread_id, msg)
+    await process_thread_fulfillment(db, msg.thread_id, msg, user_id=user_id)
     return {}
 
 
@@ -168,7 +174,12 @@ async def status_node(state: PipelineState, config: RunnableConfig) -> dict[str,
     Every transition is logged as a CommitmentEvent with evidence.
     """
     db: AsyncSession = config["configurable"]["db"]
-    await update_commitment_statuses(db)
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
+    
+    from circleback.config import get_settings
+    at_risk_hours = get_settings().at_risk_hours_before_deadline
+    
+    await update_commitment_statuses(db, at_risk_hours=at_risk_hours, user_id=user_id)
     return {"processing_complete": True}
 
 
@@ -176,7 +187,8 @@ async def digest_node(state: PipelineState, config: RunnableConfig) -> dict[str,
     """Digest generation node: compile active commitments into grouped lists."""
     from circleback.pipeline.digest import generate_digest
     db: AsyncSession = config["configurable"]["db"]
-    digest_data = await generate_digest(db)
+    user_id = config["configurable"].get("user_id") or state.get("user_id")
+    digest_data = await generate_digest(db, user_id=user_id)
     return {"digest_data": digest_data}
 
 
@@ -188,10 +200,6 @@ def correction_node(state: PipelineState, config: RunnableConfig) -> dict[str, A
     """
     # Wait for human input. The frontend/API will resume this graph with correction data.
     correction_data = interrupt({"pending_corrections": state.get("digest_data", {})})
-    
-    # We will handle the database application in the API endpoint before resuming,
-    # or we can do it here if we make this node async.
-    # For now, simply record the response in state.
     return {"correction_response": correction_data}
 
 
@@ -209,27 +217,16 @@ def route_after_prefilter(state: PipelineState) -> str:
 # ── Graph Compilation ─────────────────────────────────────────
 
 
-def compile_pipeline_graph(checkpointer: Any | None = None) -> Any:
-    """Compile and return the LangGraph state machine.
-
-    Each pipeline stage is a separate node — independently unit-testable
-    and independently loggable, as required by the spec.
-
-    Args:
-        checkpointer: Optional LangGraph checkpointer for state persistence.
-                     Defaults to MemorySaver for in-process persistence.
-    """
+def compile_ingestion_graph(checkpointer: Any | None = None) -> Any:
+    """Compile and return the LangGraph ingestion pipeline state machine."""
     workflow = StateGraph(PipelineState)
 
-    # Add individual nodes (spec §6: "each stage is a LangGraph node")
     workflow.add_node("prefilter", prefilter_node)
     workflow.add_node("extract", extract_node)
     workflow.add_node("temporal", temporal_node)
     workflow.add_node("link", link_node)
     workflow.add_node("fulfill", fulfill_node)
     workflow.add_node("status", status_node)
-    workflow.add_node("digest", digest_node)
-    workflow.add_node("correction", correction_node)
 
     # Wire the edges
     workflow.add_edge(START, "prefilter")
@@ -243,19 +240,27 @@ def compile_pipeline_graph(checkpointer: Any | None = None) -> Any:
         }
     )
 
-    # After extraction, resolve temporal phrases
     workflow.add_edge("extract", "temporal")
-    # After temporal, link threads and entities
     workflow.add_edge("temporal", "link")
-    # After linking, check for fulfillment signals
     workflow.add_edge("link", "fulfill")
-    # After fulfillment, update all statuses
     workflow.add_edge("fulfill", "status")
-    # After status, generate digest
-    workflow.add_edge("status", "digest")
-    # After digest, allow human correction via interrupt
+    workflow.add_edge("status", END)
+
+    if checkpointer is None:
+        checkpointer = global_checkpointer
+
+    return workflow.compile(checkpointer=checkpointer)
+
+
+def compile_digest_graph(checkpointer: Any | None = None) -> Any:
+    """Compile and return the LangGraph digest/correction pipeline state machine."""
+    workflow = StateGraph(PipelineState)
+
+    workflow.add_node("digest", digest_node)
+    workflow.add_node("correction", correction_node)
+
+    workflow.add_edge(START, "digest")
     workflow.add_edge("digest", "correction")
-    # Done
     workflow.add_edge("correction", END)
 
     if checkpointer is None:
@@ -264,15 +269,21 @@ def compile_pipeline_graph(checkpointer: Any | None = None) -> Any:
     return workflow.compile(checkpointer=checkpointer)
 
 
+# Backward compatibility alias
+compile_pipeline_graph = compile_ingestion_graph
+
+
 async def run_pipeline_for_message(
     db: AsyncSession,
     message_id: str,
+    user_id: str,
     external_thread_id: str | None = None,
     self_email: str = "",
 ) -> None:
-    """Helper to invoke the compiled LangGraph pipeline for a specific message."""
-    graph = compile_pipeline_graph()
+    """Helper to invoke the compiled LangGraph ingestion pipeline for a specific message."""
+    graph = compile_ingestion_graph()
     initial_state = {
+        "user_id": user_id,
         "message_id": message_id,
         "external_thread_id": external_thread_id,
         "self_email": self_email,
@@ -282,6 +293,5 @@ async def run_pipeline_for_message(
     }
     await graph.ainvoke(
         initial_state,
-        {"configurable": {"thread_id": message_id, "db": db}}
+        {"configurable": {"thread_id": message_id, "db": db, "user_id": user_id}}
     )
-

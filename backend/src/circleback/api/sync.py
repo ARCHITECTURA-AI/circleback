@@ -31,7 +31,7 @@ async def trigger_sync(
     
     Used primarily right after onboarding to populate the initial database state.
     """
-    result = await db.execute(select(OAuthToken))
+    result = await db.execute(select(OAuthToken).where(OAuthToken.user_id == user["user_id"]))
     tokens = result.scalars().all()
     
     if not tokens:

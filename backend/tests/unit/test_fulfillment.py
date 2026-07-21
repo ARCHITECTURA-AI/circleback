@@ -20,7 +20,7 @@ from circleback.db.models import (
     CommitmentEvent,
 )
 from circleback.pipeline.fulfillment import process_thread_fulfillment
-from tests.conftest import make_commitment, make_message
+from tests.conftest import make_commitment, make_message, MOCK_USER_ID
 
 
 class TestFulfillmentMatcher:
@@ -33,7 +33,7 @@ class TestFulfillmentMatcher:
     ) -> None:
         """A follow-up message saying 'Here is the deck' resolves 'I will send the deck'."""
         # Create thread
-        thread = Thread(channel=ChannelType.EMAIL, external_thread_id="thread_abc")
+        thread = Thread(user_id=MOCK_USER_ID, channel=ChannelType.EMAIL, external_thread_id="thread_abc")
         db_session.add(thread)
         await db_session.commit()
 
@@ -86,7 +86,7 @@ class TestFulfillmentMatcher:
     ) -> None:
         """A follow-up like 'Thanks, sounds good' does not fulfill a commitment."""
         # Create thread
-        thread = Thread(channel=ChannelType.EMAIL, external_thread_id="thread_def")
+        thread = Thread(user_id=MOCK_USER_ID, channel=ChannelType.EMAIL, external_thread_id="thread_def")
         db_session.add(thread)
         await db_session.commit()
 
@@ -118,7 +118,7 @@ class TestFulfillmentMatcher:
     ) -> None:
         """A message saying 'Let's push to next Tuesday' updates resolved_deadline and sets renegotiated status."""
         # Create thread
-        thread = Thread(channel=ChannelType.EMAIL, external_thread_id="thread_ghi")
+        thread = Thread(user_id=MOCK_USER_ID, channel=ChannelType.EMAIL, external_thread_id="thread_ghi")
         db_session.add(thread)
         await db_session.commit()
 

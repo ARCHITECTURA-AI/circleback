@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 async def update_commitment_statuses(
     db: AsyncSession,
     at_risk_hours: int = 24,
+    user_id: str | None = None,
 ) -> None:
     """Scan active commitments and transition their statuses based on current time.
 
@@ -42,7 +43,7 @@ async def update_commitment_statuses(
     """
     now = datetime.now(timezone.utc)
 
-    # Fetch all active commitments
+    # Fetch all active commitments for this user
     result = await db.execute(
         select(Commitment).where(
             Commitment.status.in_([
@@ -50,7 +51,8 @@ async def update_commitment_statuses(
                 CommitmentStatus.AT_RISK,
                 CommitmentStatus.RENEGOTIATED,
                 CommitmentStatus.NEEDS_CLARIFICATION,
-            ])
+            ]),
+            Commitment.user_id == user_id
         )
     )
     commitments = result.scalars().all()

@@ -164,8 +164,11 @@ async def extract_commitments_from_message(
     db: AsyncSession,
     msg: Message,
     self_email: str = "",
+    user_id: str | None = None,
 ) -> list[Commitment]:
     """Extract commitments from a message, saving them to the database."""
+    resolved_user_id = user_id or getattr(msg, "user_id", None)
+
     # Gather thread context if available
     thread_context = ""
     if msg.thread_id:
@@ -176,6 +179,7 @@ async def extract_commitments_from_message(
                     Message.thread_id == msg.thread_id,
                     Message.id != msg.id,
                     Message.deleted_at.is_(None),
+                    Message.user_id == resolved_user_id
                 )
             ).order_by(Message.timestamp)
         )
@@ -196,7 +200,12 @@ async def extract_commitments_from_message(
     # Get sender information to determine direction
     sender_is_self = False
     if msg.sender_person_id:
-        result = await db.execute(select(Person).where(Person.id == msg.sender_person_id))
+        result = await db.execute(
+            select(Person).where(
+                Person.id == msg.sender_person_id,
+                Person.user_id == resolved_user_id
+            )
+        )
         sender = result.scalar_one_or_none()
         if sender and sender.is_self:
             sender_is_self = True
@@ -221,6 +230,7 @@ async def extract_commitments_from_message(
             commitment_type = CommitmentType.SIMPLE
 
         commitment = Commitment(
+            user_id=resolved_user_id,
             source_message_id=msg.id,
             thread_id=msg.thread_id,
             committer_person_id=msg.sender_person_id,

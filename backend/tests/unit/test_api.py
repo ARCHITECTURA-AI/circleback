@@ -6,6 +6,7 @@ TDD: These tests define the API contract.
 from __future__ import annotations
 
 import pytest
+from unittest.mock import patch
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -209,8 +210,12 @@ class TestExtendedAPI:
         assert len(data["items"]) == 1
         assert data["items"][0]["id"] == c_low.id
 
-    async def test_get_metrics_endpoint(self, client: AsyncClient) -> None:
+    @patch("circleback.pipeline.extractor.call_llm_for_extraction")
+    async def test_get_metrics_endpoint(self, mock_call_llm, client: AsyncClient) -> None:
         """GET /api/v1/metrics returns current evaluation harness scores."""
+        mock_call_llm.return_value = {
+            "commitments": []
+        }
         response = await client.get("/api/v1/metrics")
         assert response.status_code == 200
         data = response.json()

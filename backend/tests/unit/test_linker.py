@@ -21,21 +21,7 @@ class TestThreadEntityLinking:
     @pytest.mark.asyncio
     async def test_group_email_thread_by_gmail_thread_id(self, db_session) -> None:
         """Messages with the same Gmail thread ID are linked to the same Thread row."""
-        # We need a way to pass external_thread_id in messages or mock it.
-        # Let's say messages are in the DB with external_message_id, etc.
-        # But wait! In normalizer.py, we don't save external_thread_id directly to Message model
-        # because Message.thread_id is the UUID foreign key.
-        # Wait, how does the linker know the Gmail thread_id or Slack thread_ts?
-        # Let's check: does Message model have a field for raw thread identifier?
-        # Ah! In models.py, Thread model has external_thread_id. Message doesn't have raw thread id,
-        # but wait, when we sync we can group them, or we can look up/create a Thread.
-        # Wait! If we create a Thread during ingestion, that already links it!
-        # Yes! In ingestion sync (e.g. sync_gmail), we got threadId from raw message and did:
-        # permalink=f"https://mail.google.com/mail/u/0/#inbox/{thread_id}"
-        # Let's check how linker can link them.
-        # If we pass raw message info, or if we define a linker function that resolves it:
-        # Let's say the linker gets a Message and the raw external_thread_id,
-        # finds or creates a Thread row, and updates msg.thread_id.
+        # Link messages sharing the same external thread identifier to the same Thread UUID.
         msg1 = make_message(raw_text="Hello thread", channel=ChannelType.EMAIL)
         db_session.add(msg1)
         await db_session.commit()

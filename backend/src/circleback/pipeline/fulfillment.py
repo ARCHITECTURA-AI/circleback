@@ -153,13 +153,13 @@ async def call_llm_for_matching(
         return FulfillmentResult(matches=[])
 
 
-async def resolve_sender_person(db: AsyncSession, sender_handle: str) -> Person | None:
+async def resolve_sender_person(db: AsyncSession, sender_handle: str, user_id: str | None = None) -> Person | None:
     """Helper to look up a Person record by email or slack user ID."""
     if not sender_handle:
         return None
     # Assuming email_addresses and slack_user_ids are JSON/ARRAY columns in postgres
     # For a simpler approach, we fetch all and check in memory for the prototype
-    result = await db.execute(select(Person))
+    result = await db.execute(select(Person).where(Person.user_id == user_id))
     persons = result.scalars().all()
     for p in persons:
         if sender_handle in p.email_addresses or sender_handle in p.slack_user_ids:
@@ -170,15 +170,19 @@ async def process_thread_fulfillment(
     db: AsyncSession,
     thread_id: str | None,
     new_msg: Message,
+    user_id: str | None = None,
 ) -> None:
     """Analyze new message against open commitments on the thread for status updates."""
     if not thread_id:
         return
 
+    resolved_user_id = user_id or getattr(new_msg, "user_id", None)
+
     # Fetch all open/active commitments on this thread
     result = await db.execute(
         select(Commitment).where(
             Commitment.thread_id == thread_id,
+            Commitment.user_id == resolved_user_id,
             Commitment.status.in_([
                 CommitmentStatus.OPEN,
                 CommitmentStatus.AT_RISK,
@@ -209,7 +213,7 @@ async def process_thread_fulfillment(
             continue
 
         if commitment.commitment_type == CommitmentType.DELEGATED:
-            sender_person = await resolve_sender_person(db, new_msg.sender_handle)
+            sender_person = await resolve_sender_person(db, new_msg.sender_handle, user_id=resolved_user_id)
             if sender_person:
                 reason += f" (Deterministic verification: Message sent by mapped delegate {sender_person.display_name})"
                 match.confidence = min(1.0, match.confidence + 0.2)

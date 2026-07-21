@@ -18,7 +18,7 @@ from circleback.db.models import Commitment, CommitmentDirection, CommitmentStat
 from circleback.pipeline.digest import apply_commitment_correction
 from circleback.eval.harness import run_evaluation
 from circleback.api.session import get_current_user
-from circleback.pipeline.graph import compile_pipeline_graph
+from circleback.pipeline.graph import compile_digest_graph, compile_pipeline_graph
 from langgraph.types import Command
 
 logger = logging.getLogger(__name__)
@@ -100,9 +100,12 @@ async def list_commitments(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> CommitmentListResponse:
-    """List all high-confidence commitments (extraction_confidence >= 0.5)."""
+    """List all high-confidence commitments for the current user (extraction_confidence >= 0.5)."""
     # Precision over recall: borderline elements go to review queue
-    query = select(Commitment).where(Commitment.extraction_confidence >= 0.5)
+    query = select(Commitment).where(
+        Commitment.extraction_confidence >= 0.5,
+        Commitment.user_id == user["user_id"]
+    )
 
     if status is not None:
         query = query.where(Commitment.status == status)
@@ -137,8 +140,11 @@ async def list_review_queue(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> CommitmentListResponse:
-    """List all low-confidence commitments (extraction_confidence < 0.5)."""
-    query = select(Commitment).where(Commitment.extraction_confidence < 0.5)
+    """List all low-confidence commitments for the current user (extraction_confidence < 0.5)."""
+    query = select(Commitment).where(
+        Commitment.extraction_confidence < 0.5,
+        Commitment.user_id == user["user_id"]
+    )
     result = await db.execute(query)
     commitments = result.scalars().all()
 
@@ -174,7 +180,12 @@ async def correct_commitment(
     This also resumes the LangGraph correction node if it was interrupted (spec §6.9).
     """
     # 1. Lookup commitment to get the source message ID (which is the LangGraph thread_id)
-    result = await db.execute(select(Commitment).where(Commitment.id == commitment_id))
+    result = await db.execute(
+        select(Commitment).where(
+            Commitment.id == commitment_id,
+            Commitment.user_id == user["user_id"]
+        )
+    )
     commitment = result.scalar_one_or_none()
     if not commitment:
         raise HTTPException(status_code=404, detail="Commitment not found")
@@ -185,26 +196,27 @@ async def correct_commitment(
             db,
             commitment_id=commitment_id,
             action=body.action,
-            params=body.params
+            params=body.params,
+            user_id=user["user_id"]
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    # 3. Resume the LangGraph execution
-    if commitment.source_message_id:
-        graph = compile_pipeline_graph()
-        correction_data = {
-            "commitment_id": commitment_id,
-            "action": body.action,
-            "params": body.params,
-        }
-        try:
-            await graph.ainvoke(
-                Command(resume=correction_data),
-                {"configurable": {"thread_id": commitment.source_message_id, "db": db}}
-            )
-        except Exception as e:
-            logger.warning("Could not resume LangGraph thread for %s: %s", commitment.source_message_id, e)
+    # 3. Resume the LangGraph execution for the digest graph
+    graph = compile_digest_graph()
+    correction_data = {
+        "commitment_id": commitment_id,
+        "action": body.action,
+        "params": body.params,
+    }
+    digest_thread_id = f"digest_{user['user_id']}"
+    try:
+        await graph.ainvoke(
+            Command(resume=correction_data),
+            {"configurable": {"thread_id": digest_thread_id, "db": db, "user_id": user["user_id"]}}
+        )
+    except Exception as e:
+        logger.warning("Could not resume LangGraph digest thread for %s: %s", digest_thread_id, e)
 
     return {"status": "success"}
 
@@ -220,7 +232,10 @@ async def get_commitment_detail(
 
     query = (
         select(Commitment)
-        .where(Commitment.id == commitment_id)
+        .where(
+            Commitment.id == commitment_id,
+            Commitment.user_id == user["user_id"]
+        )
         .options(
             selectinload(Commitment.events),
             selectinload(Commitment.source_message)
@@ -257,15 +272,73 @@ async def get_commitment_detail(
     )
 
 
+import time
+
+# Module-level metrics cache (Phase 4)
+_metrics_cache: dict[str, Any] = {}
+_metrics_cache_timestamp: float = 0.0
+_METRICS_CACHE_TTL = 3600  # 1 hour cache TTL
+
+
 @router.get("/metrics")
 async def get_metrics(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
-    """Retrieve scores computed by the evaluation harness."""
+    """Retrieve scores computed by the evaluation harness from cache."""
+    global _metrics_cache, _metrics_cache_timestamp
+    now = time.time()
+    
+    # Return cache if valid
+    if _metrics_cache and (now - _metrics_cache_timestamp) < _METRICS_CACHE_TTL:
+        return _metrics_cache
+        
+    return {
+        "status": "no_cached_results",
+        "message": "No cached metrics available or cache expired. Run POST /api/v1/metrics/refresh to generate."
+    }
+
+
+@router.post("/metrics/refresh")
+async def refresh_metrics(
+    db: AsyncSession = Depends(get_db),
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Explicitly re-run evaluation harness and cache the results."""
+    global _metrics_cache, _metrics_cache_timestamp
     try:
         # Run evaluation on the first 50 fixtures
         metrics = await run_evaluation(db, limit=50)
+        _metrics_cache = metrics
+        _metrics_cache_timestamp = time.time()
         return metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/digest/generate")
+async def generate_user_digest(
+    db: AsyncSession = Depends(get_db),
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Trigger digest generation for the current user (runs the digest graph)."""
+    graph = compile_digest_graph()
+    digest_thread_id = f"digest_{user['user_id']}"
+    try:
+        initial_state = {
+            "user_id": user["user_id"],
+            "message_id": "",
+            "external_thread_id": None,
+            "self_email": "",
+            "should_extract": False,
+            "commitments_extracted": 0,
+            "processing_complete": False,
+        }
+        result = await graph.ainvoke(
+            initial_state,
+            {"configurable": {"thread_id": digest_thread_id, "db": db, "user_id": user["user_id"]}}
+        )
+        return result.get("digest_data", {})
+    except Exception as e:
+        logger.error("Failed to generate digest: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to generate digest: {str(e)}")

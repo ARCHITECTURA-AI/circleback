@@ -34,14 +34,17 @@ from circleback.db.models import (
     Message,
     Person,
     Thread,
+    User,
 )
 from circleback.main import create_app
 from circleback.db import get_db
+from circleback.api.session import get_current_user
 
 
 # ── Async engine for tests (SQLite in-memory) ────────────────
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+MOCK_USER_ID = "00000000-0000-0000-0000-00000000000a"
 
 
 @pytest.fixture(scope="session")
@@ -66,20 +69,24 @@ async def test_engine():
 
 @pytest_asyncio.fixture
 async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
-    """Provide a fresh DB session for each test."""
+    """Provide a fresh DB session for each test, seeded with a default User."""
     session_factory = async_sessionmaker(
         test_engine,
         class_=AsyncSession,
         expire_on_commit=False,
     )
     async with session_factory() as session:
+        # Seed the default user
+        user = make_user()
+        session.add(user)
+        await session.commit()
         yield session
         await session.rollback()
 
 
 @pytest_asyncio.fixture
 async def client(test_engine) -> AsyncGenerator[AsyncClient, None]:
-    """Provide an async HTTP client with test DB injected."""
+    """Provide an async HTTP client with test DB and authenticated session injected."""
     session_factory = async_sessionmaker(
         test_engine,
         class_=AsyncSession,
@@ -95,8 +102,16 @@ async def client(test_engine) -> AsyncGenerator[AsyncClient, None]:
                 await session.rollback()
                 raise
 
+    async def override_get_current_user() -> dict[str, Any]:
+        return {
+            "provider": "google",
+            "email": "test@company.com",
+            "user_id": MOCK_USER_ID,
+        }
+
     app = create_app()
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = override_get_current_user
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -106,14 +121,29 @@ async def client(test_engine) -> AsyncGenerator[AsyncClient, None]:
 # ── Test Data Factories ──────────────────────────────────────
 
 
+def make_user(
+    email: str = "test@company.com",
+    display_name: str = "Test User",
+    id: str = MOCK_USER_ID,
+) -> User:
+    """Create a User instance for testing."""
+    return User(
+        id=id,
+        email=email,
+        display_name=display_name,
+    )
+
+
 def make_person(
     display_name: str = "Test User",
     email_addresses: list[str] | None = None,
     slack_user_ids: list[str] | None = None,
     is_self: bool = False,
+    user_id: str = MOCK_USER_ID,
 ) -> Person:
     """Create a Person instance for testing."""
     return Person(
+        user_id=user_id,
         display_name=display_name,
         email_addresses=email_addresses or [],
         slack_user_ids=slack_user_ids or [],
@@ -127,9 +157,11 @@ def make_message(
     timestamp: datetime | None = None,
     sender_person_id: str | None = None,
     thread_id: str | None = None,
+    user_id: str = MOCK_USER_ID,
 ) -> Message:
     """Create a Message instance for testing."""
     return Message(
+        user_id=user_id,
         channel=channel,
         raw_text=raw_text,
         timestamp=timestamp or datetime.now(timezone.utc),
@@ -148,9 +180,11 @@ def make_commitment(
     source_message_id: str | None = None,
     committer_person_id: str | None = None,
     thread_id: str | None = None,
+    user_id: str = MOCK_USER_ID,
 ) -> Commitment:
     """Create a Commitment instance for testing."""
     return Commitment(
+        user_id=user_id,
         raw_text_span=raw_text_span,
         direction=direction,
         commitment_type=commitment_type,

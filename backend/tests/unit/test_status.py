@@ -12,7 +12,7 @@ from sqlalchemy import select
 
 from circleback.db.models import CommitmentStatus, CommitmentEventType, CommitmentEvent
 from circleback.pipeline.status import update_commitment_statuses
-from tests.conftest import make_commitment
+from tests.conftest import make_commitment, MOCK_USER_ID
 
 
 class TestStatusEngine:
@@ -35,7 +35,7 @@ class TestStatusEngine:
         db_session.add(c)
         await db_session.commit()
 
-        await update_commitment_statuses(db_session, at_risk_hours=24)
+        await update_commitment_statuses(db_session, at_risk_hours=24, user_id=MOCK_USER_ID)
 
         await db_session.refresh(c)
         assert c.status == CommitmentStatus.AT_RISK
@@ -57,7 +57,7 @@ class TestStatusEngine:
         db_session.add(c)
         await db_session.commit()
 
-        await update_commitment_statuses(db_session)
+        await update_commitment_statuses(db_session, user_id=MOCK_USER_ID)
 
         await db_session.refresh(c)
         assert c.status == CommitmentStatus.OVERDUE

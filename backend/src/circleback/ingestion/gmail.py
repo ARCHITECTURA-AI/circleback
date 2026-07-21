@@ -42,7 +42,7 @@ def build_gmail_client(credentials: Any = None) -> Any:
     return DummyGmailClient()
 
 
-async def ingest_single_gmail_message(db: AsyncSession, message_id: str, client: Any = None) -> Message | None:
+async def ingest_single_gmail_message(db: AsyncSession, message_id: str, user_id: str, client: Any = None) -> Message | None:
     """Fetch a single Gmail message, normalize it, and save or update it in the database."""
     if client is None:
         client = build_gmail_client()
@@ -57,14 +57,20 @@ async def ingest_single_gmail_message(db: AsyncSession, message_id: str, client:
         return None
 
     # Check if message already exists
-    result = await db.execute(select(Message).where(Message.external_message_id == message_id))
+    result = await db.execute(
+        select(Message).where(
+            Message.external_message_id == message_id,
+            Message.user_id == user_id
+        )
+    )
     existing_msg = result.scalar_one_or_none()
 
     normalized = normalize_gmail_message(raw_msg)
+    normalized.user_id = user_id
 
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True))
+    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 
@@ -76,14 +82,14 @@ async def ingest_single_gmail_message(db: AsyncSession, message_id: str, client:
         existing_msg.edited_at = datetime.now(timezone.utc)
         await db.flush()
         # Trigger pipeline run for edited message
-        await run_pipeline_for_message(db, existing_msg.id, self_email=self_email)
+        await run_pipeline_for_message(db, existing_msg.id, user_id=user_id, self_email=self_email)
         return existing_msg
     else:
         # New message
         db.add(normalized)
         await db.flush()
         # Trigger pipeline run for new message
-        await run_pipeline_for_message(db, normalized.id, external_thread_id=normalized.thread_id, self_email=self_email)
+        await run_pipeline_for_message(db, normalized.id, user_id=user_id, external_thread_id=normalized.thread_id, self_email=self_email)
         return normalized
 
 
@@ -114,13 +120,18 @@ async def sync_gmail(db: AsyncSession, user_id: str, last_history_id: str | None
             ext_id = del_msg.get("message", {}).get("id")
             if ext_id:
                 # Find message and mark deleted
-                res = await db.execute(select(Message).where(Message.external_message_id == ext_id))
+                res = await db.execute(
+                    select(Message).where(
+                        Message.external_message_id == ext_id,
+                        Message.user_id == user_id
+                    )
+                )
                 msg = res.scalar_one_or_none()
                 if msg:
                     msg.deleted_at = datetime.now(timezone.utc)
                     
                     # Create RETRACTED_SOURCE CommitmentEvent for all linked commitments
-                    c_res = await db.execute(select(Commitment).where(Commitment.source_message_id == msg.id))
+                    c_res = await db.execute(select(Commitment).where(Commitment.source_message_id == msg.id, Commitment.user_id == user_id))
                     commitments = c_res.scalars().all()
                     for commitment in commitments:
                         event = CommitmentEvent(
@@ -135,6 +146,6 @@ async def sync_gmail(db: AsyncSession, user_id: str, last_history_id: str | None
         for msg_added in record.get("messagesAdded", []):
             ext_id = msg_added.get("message", {}).get("id")
             if ext_id:
-                await ingest_single_gmail_message(db, ext_id, client=client)
+                await ingest_single_gmail_message(db, ext_id, user_id, client=client)
 
     return new_history_id

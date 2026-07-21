@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from circleback.db.models import ChannelType, CommitmentStatus, Message, Person
 from circleback.ingestion.gmail import sync_gmail
-from tests.conftest import make_commitment, make_message, make_person
+from tests.conftest import make_commitment, make_message, make_person, MOCK_USER_ID
 
 
 class TestGmailIngestion:
@@ -37,7 +37,7 @@ class TestGmailIngestion:
         # Run sync first time (full backfill/start)
         # In a real sync we might store history_id in a sync state or token record.
         # Let's say we pass the last history_id or keep it in a session.
-        await sync_gmail(db_session, user_id="user_me", last_history_id="12345")
+        await sync_gmail(db_session, user_id=MOCK_USER_ID, last_history_id="12345")
         
         # Verify the history list was called with startHistoryId="12345"
         mock_client.users().history().list.assert_called_with(
@@ -77,7 +77,7 @@ class TestGmailIngestion:
         # Run single message ingestion for the updated message ID
         # Wait, if we sync a message that already exists, it should update it and set edited_at
         from circleback.ingestion.gmail import ingest_single_gmail_message
-        await ingest_single_gmail_message(db_session, "gmail_msg_edit_123")
+        await ingest_single_gmail_message(db_session, "gmail_msg_edit_123", MOCK_USER_ID)
 
         # Refetch from DB
         await db_session.refresh(msg)
@@ -118,7 +118,7 @@ class TestGmailIngestion:
             "historyId": "10000"
         })
 
-        await sync_gmail(db_session, user_id="user_me", last_history_id="12345")
+        await sync_gmail(db_session, user_id=MOCK_USER_ID, last_history_id="12345")
 
         # Refetch
         await db_session.refresh(msg)

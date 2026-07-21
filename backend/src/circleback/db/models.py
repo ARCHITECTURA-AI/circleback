@@ -1,7 +1,7 @@
 """SQLAlchemy ORM models for Circle Back.
 
 Implements the full data model from the technical specification:
-Person, Message, Thread, Commitment, CommitmentEvent, EvalLabel.
+User, Person, Message, Thread, Commitment, CommitmentEvent, EvalLabel.
 
 Design decisions:
 - JSONB arrays for email_addresses/slack_user_ids (flexible, queryable in Postgres)
@@ -26,6 +26,7 @@ from sqlalchemy import (
     JSON,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -104,6 +105,24 @@ class CommitmentEventType(str, enum.Enum):
 # ── Models ────────────────────────────────────────────────────
 
 
+class User(Base):
+    """User account model for multi-tenancy."""
+
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
 class Person(Base):
     """A person who sends or receives commitments.
 
@@ -118,6 +137,11 @@ class Person(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     email_addresses: Mapped[list] = mapped_column(
@@ -143,6 +167,7 @@ class Person(Base):
     )
 
     # Relationships
+    user: Mapped[User] = relationship()
     sent_messages: Mapped[list[Message]] = relationship(
         back_populates="sender",
         foreign_keys="Message.sender_person_id",
@@ -166,6 +191,11 @@ class Thread(Base):
         primary_key=True,
         default=lambda: str(uuid4()),
     )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     channel: Mapped[ChannelType] = mapped_column(
         Enum(ChannelType, name="channel_type", create_constraint=True),
         nullable=False,
@@ -188,6 +218,7 @@ class Thread(Base):
     )
 
     # Relationships
+    user: Mapped[User] = relationship()
     messages: Mapped[list[Message]] = relationship(back_populates="thread")
     commitments: Mapped[list[Commitment]] = relationship(back_populates="thread")
 
@@ -206,6 +237,11 @@ class Message(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
     channel: Mapped[ChannelType] = mapped_column(
         Enum(ChannelType, name="channel_type", create_constraint=True),
@@ -258,6 +294,7 @@ class Message(Base):
     )
 
     # Relationships
+    user: Mapped[User] = relationship()
     thread: Mapped[Thread | None] = relationship(back_populates="messages")
     sender: Mapped[Person | None] = relationship(
         back_populates="sent_messages",
@@ -283,6 +320,11 @@ class Commitment(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
     source_message_id: Mapped[str | None] = mapped_column(
         UUID(as_uuid=False),
@@ -353,6 +395,7 @@ class Commitment(Base):
     )
 
     # Relationships
+    user: Mapped[User] = relationship()
     source_message: Mapped[Message | None] = relationship(
         back_populates="commitments",
         foreign_keys=[source_message_id],
@@ -423,6 +466,11 @@ class EvalLabel(Base):
         primary_key=True,
         default=lambda: str(uuid4()),
     )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     message_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
         ForeignKey("messages.id"),
@@ -439,6 +487,7 @@ class EvalLabel(Base):
     )
 
     # Relationships
+    user: Mapped[User] = relationship()
     message: Mapped[Message] = relationship()
 
 
@@ -450,11 +499,19 @@ class OAuthToken(Base):
     """
 
     __tablename__ = "oauth_tokens"
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider", name="uq_user_provider"),
+    )
 
     id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
     provider: Mapped[str] = mapped_column(
         String(50),
@@ -494,6 +551,9 @@ class OAuthToken(Base):
         onupdate=func.now(),
     )
 
+    # Relationships
+    user: Mapped[User] = relationship()
+
 
 class UnrecognizedSender(Base):
     """Persisted record of unrecognized sender handles for manual review.
@@ -508,6 +568,11 @@ class UnrecognizedSender(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
     handle: Mapped[str] = mapped_column(
         String(255),
@@ -539,3 +604,6 @@ class UnrecognizedSender(Base):
         DateTime(timezone=True),
         server_default=func.now(),
     )
+
+    # Relationships
+    user: Mapped[User] = relationship()

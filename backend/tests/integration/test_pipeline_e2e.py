@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from circleback.db.models import ChannelType, CommitmentDirection, CommitmentStatus, CommitmentType, Person, Thread, Commitment
 from circleback.pipeline.graph import compile_pipeline_graph
-from tests.conftest import make_message, make_person
+from tests.conftest import make_message, make_person, MOCK_USER_ID
 
 
 class TestPipelineE2E:
@@ -31,7 +31,7 @@ class TestPipelineE2E:
         await db_session.commit()
 
         # 2. Setup Thread
-        thread = Thread(channel=ChannelType.EMAIL, external_thread_id="thread_e2e_123")
+        thread = Thread(user_id=MOCK_USER_ID, channel=ChannelType.EMAIL, external_thread_id="thread_e2e_123")
         db_session.add(thread)
         await db_session.commit()
 
@@ -66,12 +66,13 @@ class TestPipelineE2E:
         
         # Invoke the graph with the initial state
         initial_state = {
+            "user_id": MOCK_USER_ID,
             "message_id": msg.id,
             "external_thread_id": "thread_e2e_123",
             "self_email": "me@company.com"
         }
         
-        await graph.ainvoke(initial_state, {"configurable": {"thread_id": msg.id, "db": db_session}})
+        await graph.ainvoke(initial_state, {"configurable": {"thread_id": msg.id, "db": db_session, "user_id": MOCK_USER_ID}})
 
         # 6. Verify database side effects
         from sqlalchemy import select

@@ -59,8 +59,8 @@ async def list_persons(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> PersonListResponse:
-    """List all person mappings."""
-    result = await db.execute(select(Person))
+    """List all person mappings for the current user."""
+    result = await db.execute(select(Person).where(Person.user_id == user["user_id"]))
     persons = result.scalars().all()
 
     items = [
@@ -83,8 +83,9 @@ async def create_person(
     db: AsyncSession = Depends(get_db),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> PersonResponse:
-    """Create a new person mapping."""
+    """Create a new person mapping for the current user."""
     person = Person(
+        user_id=user["user_id"],
         display_name=body.display_name,
         email_addresses=body.email_addresses,
         slack_user_ids=body.slack_user_ids,
