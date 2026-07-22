@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import { getCommitmentDetail, correctCommitment, type CommitmentDetail } from "@/lib/api";
 import StatusBadge from "@/components/StatusBadge";
 import { LoadingState, ErrorState } from "@/components/EmptyState";
@@ -17,7 +17,7 @@ export default function CommitmentDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -28,12 +28,12 @@ export default function CommitmentDetailPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [commitmentId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
-  }, [commitmentId]);
+  }, [loadData]);
 
   const handleCorrect = async (action: string, extraParams?: Record<string, string>) => {
     try {

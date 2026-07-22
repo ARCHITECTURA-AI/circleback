@@ -14,8 +14,7 @@ Design decisions:
 from __future__ import annotations
 
 import enum
-from datetime import datetime
-from typing import TYPE_CHECKING
+from datetime import datetime  # noqa: TC003
 from uuid import uuid4
 
 from sqlalchemy import (
