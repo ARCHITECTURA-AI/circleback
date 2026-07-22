@@ -54,8 +54,8 @@ def start_scheduler() -> None:
     Requires the `apscheduler` package.
     """
     try:
-        from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore[import-untyped]
-        from apscheduler.triggers.cron import CronTrigger  # type: ignore[import-untyped]
+        from apscheduler.schedulers.asyncio import AsyncIOScheduler
+        from apscheduler.triggers.cron import CronTrigger
     except ImportError:
         logger.warning(
             "apscheduler is not installed — digest scheduler disabled. "

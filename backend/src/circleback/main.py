@@ -10,7 +10,6 @@ import logging
 import sys
 import time
 from collections import defaultdict
-from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
@@ -85,7 +84,7 @@ def _is_rate_limited(client_ip: str) -> bool:
 
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    from collections.abc import AsyncGenerator, Awaitable, Callable
 
 
 @asynccontextmanager
