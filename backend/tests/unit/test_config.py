@@ -29,6 +29,13 @@ class TestConfigLoadsFromEnv:
         settings = Settings(_env_file=None)  # type: ignore[call-arg]
         assert settings.anthropic_api_key == "sk-test-123"
 
+    def test_config_loads_groq_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """GROQ_API_KEY is loaded from environment."""
+        monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://u:p@localhost/db")
+        monkeypatch.setenv("GROQ_API_KEY", "gsk-test-456")
+        settings = Settings(_env_file=None)  # type: ignore[call-arg]
+        assert settings.groq_api_key == "gsk-test-456"
+
     def test_config_defaults_for_optional_fields(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -43,8 +50,10 @@ class TestConfigLoadsFromEnv:
         assert settings.app_name == "Circle Back"
         assert settings.debug is False
         assert settings.log_level == "INFO"
-        assert settings.llm_daily_cost_limit_usd == 10.0
+        assert settings.llm_daily_cost_limit_usd == 1.0
         assert settings.at_risk_hours_before_deadline == 24
+        assert settings.llm_provider == "groq"
+        assert settings.llm_model == "llama-3.1-8b-instant"
 
 
 class TestConfigFailsOnMissing:

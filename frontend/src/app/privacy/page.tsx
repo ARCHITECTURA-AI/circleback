@@ -20,8 +20,9 @@ export default function PrivacyPage() {
 
       <h2>2. Third-Party LLM Processing</h2>
       <p>
-        To extract commitments and detect fulfillment, Circle Back sends the contents of your synced messages to Anthropic&apos;s Claude API. 
-        Your data is processed according to Anthropic&apos;s privacy policy and is not used to train their models under their standard API terms.
+        To extract commitments and detect fulfillment, Circle Back sends the contents of your synced messages to a third-party LLM API. 
+        By default, this is Groq&apos;s API (using the Llama model family). Alternatively, the system can be configured to use Anthropic&apos;s Claude API.
+        Your data is processed according to the respective provider&apos;s privacy policy and is not used to train their models under standard API terms.
       </p>
 
       <h2>3. Retention and Deletion</h2>

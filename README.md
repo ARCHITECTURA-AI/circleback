@@ -38,7 +38,7 @@ graph TD
 ### Pipeline Node Explanations:
 1. **Ingestion & Normalizer**: Syncs messages incrementally and maps the channels into a unified schema, maintaining soft-deletes to prevent silent data loss.
 2. **Cheap Prefilter**: Uses regex patterns to filter out irrelevant messages at scale and minimize LLM expenses.
-3. **LLM Extraction**: Uses Claude via structured output to identify individual commitments, bias-calibrating towards precision over recall.
+3. **LLM Extraction**: Uses Groq (Llama 3.1 8B) via structured output to identify individual commitments, bias-calibrating towards precision over recall. Supports Anthropic Claude as configurable fallback.
 4. **Temporal Resolution**: Parses relative phrasing ("by next Friday", "tomorrow morning") into concrete datetime deadlines.
 5. **Thread/Entity Linking**: Matches threads across platforms and maps user accounts using manual seed lists.
 6. **Fulfillment Matching**: Checks subsequent thread context semantically to verify if the committer fulfilled or renegotiated the deadline.

@@ -49,7 +49,7 @@ Circle Back is not a summarizer and not a to-do list. It is a state machine that
 | Database | **PostgreSQL** | Relational model fits the evidence-trail/audit-log requirement (Commitment → CommitmentEvent) far better than a document store. |
 | Frontend | **Next.js + TypeScript + Tailwind** | Needs a real public-facing UI (onboarding, digest, commitment detail, settings) — not just an API demo. |
 | Auth | OAuth 2.0 (Google, Slack) + session-based app auth | Standard, and required for the verification processes below. |
-| LLM provider | Claude via Anthropic API | Structured output for extraction; function calling for tool use in the pipeline. |
+| LLM provider | Groq (Llama 3.1 8B, default) / Anthropic Claude (fallback) | Dual-provider support via config toggle. Groq for cost efficiency; Anthropic for structured output reliability. |
 | Hosting | Backend: Fly.io or Render. Frontend: Vercel. DB: managed Postgres (Neon/Supabase/RDS). | Reasonable default for a solo-maintained public project — revisit if cost or scale demands change this. |
 
 > Pin LangGraph's version explicitly at project start — its API has changed across versions. Verify current best practices for the interrupt/checkpoint patterns before scaffolding, rather than relying on possibly-stale documentation.

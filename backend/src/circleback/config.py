@@ -29,7 +29,21 @@ class Settings(BaseSettings):
     # ── API Keys ──────────────────────────────────────────────
     anthropic_api_key: str = Field(
         default="",
-        description="Anthropic API key for Claude LLM calls",
+        description="Anthropic API key for Claude LLM calls (used when llm_provider='anthropic')",
+    )
+    groq_api_key: str = Field(
+        default="",
+        description="Groq API key for LLM calls (used when llm_provider='groq')",
+    )
+
+    # ── LLM Provider ──────────────────────────────────────────
+    llm_provider: str = Field(
+        default="groq",
+        description="LLM provider to use: 'groq' (default) or 'anthropic'",
+    )
+    llm_model: str = Field(
+        default="llama-3.1-8b-instant",
+        description="Model name to use (default: llama-3.1-8b-instant for Groq, claude-sonnet-4-20250514 for Anthropic)",
     )
 
     # ── OAuth (Gmail) ─────────────────────────────────────────
@@ -70,7 +84,7 @@ class Settings(BaseSettings):
 
     # ── LLM Cost Controls ─────────────────────────────────────
     llm_daily_cost_limit_usd: float = Field(
-        default=10.0,
+        default=1.0,
         description="Hard daily spend limit on LLM API calls",
     )
 

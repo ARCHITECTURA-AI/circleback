@@ -109,7 +109,7 @@ async def call_llm_for_matching(
 ) -> FulfillmentResult:
     """Call Claude API to check if new_message fulfills/renegotiates open_commitments.
 
-    In test mode (no ANTHROPIC_API_KEY), returns empty results.
+    In test mode (no LLM API key configured), returns empty results.
     """
     if not open_commitments:
         return FulfillmentResult(matches=[])
@@ -117,13 +117,15 @@ async def call_llm_for_matching(
     try:
         from circleback.config import get_settings
         settings = get_settings()
-        if not settings.anthropic_api_key:
-            logger.debug("No ANTHROPIC_API_KEY configured — returning empty fulfillment.")
+        provider = settings.llm_provider
+        api_key = settings.groq_api_key if provider == "groq" else settings.anthropic_api_key
+        if not api_key:
+            logger.debug("No %s API key configured — returning empty fulfillment.", provider.upper())
             return FulfillmentResult(matches=[])
     except Exception:
         return FulfillmentResult(matches=[])
 
-    from circleback.pipeline.llm_client import call_claude_structured
+    from circleback.pipeline.llm_client import call_llm_structured
 
     # Build context about open commitments
     commitments_text = "\n".join(
@@ -141,10 +143,12 @@ async def call_llm_for_matching(
     )
 
     try:
-        result = await call_claude_structured(
+        result = await call_llm_structured(
             system_prompt=FULFILLMENT_SYSTEM_PROMPT,
             user_message=user_message,
             output_schema=FulfillmentResult,
+            provider=settings.llm_provider,
+            model=settings.llm_model,
             daily_cost_limit=settings.llm_daily_cost_limit_usd,
         )
         return result

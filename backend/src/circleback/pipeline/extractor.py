@@ -1,6 +1,6 @@
 """LLM Extraction node in the LangGraph agent pipeline.
 
-Uses Anthropic's Claude API to perform structured extraction of commitments
+Uses Groq's LLM API (default) or Anthropic's Claude API to perform structured extraction
 from normalized messages, determining type, direction, and confidence.
 
 Design decisions:
@@ -128,28 +128,32 @@ async def call_llm_for_extraction(
 ) -> ExtractionResult:
     """Call Claude API for structured commitment extraction.
 
-    In test mode (no ANTHROPIC_API_KEY), returns empty results.
+    In test mode (no LLM API key configured), returns empty results.
     """
     try:
         from circleback.config import get_settings
         settings = get_settings()
-        if not settings.anthropic_api_key:
-            logger.debug("No ANTHROPIC_API_KEY configured — returning empty extraction.")
+        provider = settings.llm_provider
+        api_key = settings.groq_api_key if provider == "groq" else settings.anthropic_api_key
+        if not api_key:
+            logger.debug("No %s API key configured — returning empty extraction.", provider.upper())
             return ExtractionResult(commitments=[])
     except Exception:
         return ExtractionResult(commitments=[])
 
-    from circleback.pipeline.llm_client import call_claude_structured
+    from circleback.pipeline.llm_client import call_llm_structured
 
     user_message = f"Analyze this message for commitments:\n\n{text}"
     if thread_context:
         user_message = f"Thread context (for reference only — extract from the LATEST message):\n{thread_context}\n\n---\n\nLatest message to analyze:\n\n{text}"
 
     try:
-        result = await call_claude_structured(
+        result = await call_llm_structured(
             system_prompt=EXTRACTION_SYSTEM_PROMPT,
             user_message=user_message,
             output_schema=ExtractionResult,
+            provider=settings.llm_provider,
+            model=settings.llm_model,
             daily_cost_limit=settings.llm_daily_cost_limit_usd,
         )
         return result
