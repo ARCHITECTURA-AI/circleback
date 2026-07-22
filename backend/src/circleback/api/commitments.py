@@ -355,7 +355,7 @@ async def generate_user_digest(
             initial_state,
             {"configurable": {"thread_id": digest_thread_id, "db": db, "user_id": user["user_id"]}}
         )
-        return result.get("digest_data", {})
+        return result.get("digest_data", {})  # type: ignore[no-any-return]
     except Exception as e:
         logger.error("Failed to generate digest: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to generate digest: {str(e)}")

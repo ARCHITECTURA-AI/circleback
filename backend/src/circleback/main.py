@@ -10,6 +10,7 @@ import logging
 import sys
 import time
 from collections import defaultdict
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
@@ -121,7 +122,7 @@ def create_app() -> FastAPI:
 
     # ── HTTPS Redirect Middleware (production only) ────────────
     @app.middleware("http")
-    async def https_redirect_middleware(request: Request, call_next: object) -> Response:
+    async def https_redirect_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         """Redirect HTTP to HTTPS when base_url is configured with https (spec §10).
 
         Only active in production (debug=False). Skips health checks.
@@ -134,11 +135,11 @@ def create_app() -> FastAPI:
         ):
             https_url = str(request.url).replace("http://", "https://", 1)
             return RedirectResponse(url=https_url, status_code=301)
-        return await call_next(request)  # type: ignore[operator]
+        return await call_next(request)
 
     # ── Rate Limiting Middleware ───────────────────────────────
     @app.middleware("http")
-    async def rate_limit_middleware(request: Request, call_next: object) -> Response:
+    async def rate_limit_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         """Enforce rate limiting per client IP (spec §10)."""
         client_ip = request.client.host if request.client else "unknown"
         if _is_rate_limited(client_ip):
@@ -147,8 +148,7 @@ def create_app() -> FastAPI:
                 status_code=429,
                 media_type="application/json",
             )
-        response = await call_next(request)  # type: ignore[operator]
-        return response
+        return await call_next(request)
 
     # ── Routers ───────────────────────────────────────────────
     app.include_router(health_router)

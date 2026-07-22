@@ -208,8 +208,8 @@ async def extract_commitments_from_message(
                 Person.user_id == resolved_user_id
             )
         )
-        sender = result.scalar_one_or_none()
-        if sender and sender.is_self:
+        sender_person = result.scalar_one_or_none()
+        if sender_person and getattr(sender_person, "is_self", False):
             sender_is_self = True
     elif self_email and msg.sender_handle:
         sender_is_self = msg.sender_handle.strip().lower() == self_email.strip().lower()

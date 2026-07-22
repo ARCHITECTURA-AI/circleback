@@ -156,7 +156,7 @@ async def call_llm_for_matching(
         return FulfillmentResult(matches=[])
 
 
-async def resolve_sender_person(db: AsyncSession, sender_handle: str, user_id: str | None = None) -> Person | None:
+async def resolve_sender_person(db: AsyncSession, sender_handle: str | None, user_id: str | None = None) -> Person | None:
     """Helper to look up a Person record by email or slack user ID."""
     if not sender_handle:
         return None

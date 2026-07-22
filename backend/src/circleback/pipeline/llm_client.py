@@ -85,7 +85,7 @@ async def call_claude_structured(
     from langchain_anthropic import ChatAnthropic
 
     llm = ChatAnthropic(
-        model_name=model,
+        model_name=model,  # type: ignore[call-arg]
         temperature=temperature,
         max_tokens=max_tokens,
     )
@@ -120,7 +120,7 @@ async def call_claude_raw(
     from langchain_anthropic import ChatAnthropic
 
     llm = ChatAnthropic(
-        model_name=model,
+        model_name=model,  # type: ignore[call-arg]
         temperature=temperature,
         max_tokens=max_tokens,
     )

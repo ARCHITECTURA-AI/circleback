@@ -148,16 +148,16 @@ async def run_evaluation(db: AsyncSession, limit: int | None = None, user_id: st
         else:
             tn += 1
 
-    metrics = calculate_metrics(tp, fp, fn)
-    metrics["total_tested"] = len(fixtures)
-    metrics["tp"] = tp
-    metrics["fp"] = fp
-    metrics["fn"] = fn
-    metrics["tn"] = tn
-    metrics["type_accuracy"] = type_correct / type_total if type_total > 0 else None
-    metrics["type_evaluated"] = type_total
-    metrics["prefilter_false_negatives"] = len(prefilter_false_negatives)
-    metrics["example_successes"] = examples_success[:5]  # Show top 5
-    metrics["example_failures"] = examples_failure[:5]   # Show top 5
+    metrics_dict: dict[str, Any] = dict(calculate_metrics(tp, fp, fn))
+    metrics_dict["total_tested"] = len(fixtures)
+    metrics_dict["tp"] = tp
+    metrics_dict["fp"] = fp
+    metrics_dict["fn"] = fn
+    metrics_dict["tn"] = tn
+    metrics_dict["type_accuracy"] = type_correct / type_total if type_total > 0 else None
+    metrics_dict["type_evaluated"] = type_total
+    metrics_dict["prefilter_false_negatives"] = len(prefilter_false_negatives)
+    metrics_dict["example_successes"] = examples_success[:5]  # Show top 5
+    metrics_dict["example_failures"] = examples_failure[:5]
 
-    return metrics
+    return metrics_dict

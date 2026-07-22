@@ -151,4 +151,4 @@ async def sync_gmail(db: AsyncSession, user_id: str, last_history_id: str | None
             if ext_id:
                 await ingest_single_gmail_message(db, ext_id, user_id, client=client)
 
-    return new_history_id
+    return str(new_history_id) if new_history_id is not None else None
