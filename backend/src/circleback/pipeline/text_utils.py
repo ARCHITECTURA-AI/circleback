@@ -7,9 +7,10 @@ false positives from quoted commitments.
 
 import re
 
+
 def strip_quoted_content(text: str) -> str:
     """Strip quoted reply chains and forwarded content from emails.
-    
+
     Removes:
     - Lines starting with `>` (standard email quoting)
     - Content after `On [date], [person] wrote:`
@@ -26,7 +27,7 @@ def strip_quoted_content(text: str) -> str:
         if line.strip().startswith(">"):
             continue
         cleaned_lines.append(line)
-    
+
     text = "\n".join(cleaned_lines)
 
     # Cut off at "On ... wrote:" patterns
@@ -36,7 +37,7 @@ def strip_quoted_content(text: str) -> str:
     # Cut off at forwarded message headers
     forward_pattern = r"(?i)\n*---------- Forwarded message ---------\n*"
     text = re.split(forward_pattern, text)[0]
-    
+
     # Cut off at "From: " blocks that typically start a forwarded/replied thread
     # Needs to match From:, Date:, Subject:, To: blocks
     from_block_pattern = r"(?i)\n*From:\s+.*?\nDate:\s+.*?\n"

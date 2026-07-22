@@ -20,8 +20,8 @@ export default function PrivacyPage() {
 
       <h2>2. Third-Party LLM Processing</h2>
       <p>
-        To extract commitments and detect fulfillment, Circle Back sends the contents of your synced messages to Anthropic's Claude API. 
-        Your data is processed according to Anthropic's privacy policy and is not used to train their models under their standard API terms.
+        To extract commitments and detect fulfillment, Circle Back sends the contents of your synced messages to Anthropic&apos;s Claude API. 
+        Your data is processed according to Anthropic&apos;s privacy policy and is not used to train their models under their standard API terms.
       </p>
 
       <h2>3. Retention and Deletion</h2>
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         We store your data as long as your account remains connected. You can permanently delete all your data at any time.
       </p>
       <p>
-        <strong>How to delete your data:</strong> Go to your Dashboard, navigate to the Settings panel, and click "Disconnect and Delete My Data". This performs an absolute purge of all tokens, messages, commitments, and identity mappings from the database. It is not a "soft delete" — the data is permanently erased.
+        <strong>How to delete your data:</strong> Go to your Dashboard, navigate to the Settings panel, and click &quot;Disconnect and Delete My Data&quot;. This performs an absolute purge of all tokens, messages, commitments, and identity mappings from the database. It is not a &quot;soft delete&quot; — the data is permanently erased.
       </p>
 
       <h2>4. Encryption and Security</h2>

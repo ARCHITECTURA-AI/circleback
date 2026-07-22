@@ -13,8 +13,9 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import (
     Commitment,
@@ -22,6 +23,9 @@ from circleback.db.models import (
     CommitmentEventType,
     CommitmentStatus,
 )
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +93,10 @@ async def update_commitment_statuses(
                 )
 
         # 2. At risk: deadline approaching within threshold
-        elif total_seconds_left <= at_risk_hours * 3600:
-            if commitment.status in (CommitmentStatus.OPEN, CommitmentStatus.RENEGOTIATED):
+        elif (
+            total_seconds_left <= at_risk_hours * 3600
+            and commitment.status in (CommitmentStatus.OPEN, CommitmentStatus.RENEGOTIATED)
+        ):
                 commitment.status = CommitmentStatus.AT_RISK
                 hours_remaining = total_seconds_left / 3600
                 event = CommitmentEvent(

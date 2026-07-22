@@ -7,15 +7,18 @@ Person records. This API powers that workflow.
 
 from __future__ import annotations
 
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from typing import TYPE_CHECKING, Any
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from circleback.api.session import get_current_user
 from circleback.db import get_db
 from circleback.db.models import Person
-from circleback.api.session import get_current_user
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(tags=["persons"])
 

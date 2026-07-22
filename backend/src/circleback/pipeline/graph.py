@@ -10,26 +10,29 @@ checkpointing for persistence across sessions.
 
 from __future__ import annotations
 
-from typing import TypedDict, Any
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from langgraph.graph import StateGraph, START, END
+from typing import TYPE_CHECKING, Any, TypedDict
+
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.types import interrupt, Command
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import interrupt
+from sqlalchemy import select
+
+from circleback.db.models import Message
+from circleback.pipeline.extractor import extract_commitments_from_message
+from circleback.pipeline.fulfillment import process_thread_fulfillment
+from circleback.pipeline.linker import link_thread_and_entities
+from circleback.pipeline.prefilter import should_process_message
+from circleback.pipeline.status import update_commitment_statuses
+from circleback.pipeline.temporal import resolve_deadline
 
 # Global checkpointer so state is preserved across API requests for interrupt/resume
 global_checkpointer = MemorySaver()
 
-from langchain_core.runnables import RunnableConfig
 
-from circleback.db.models import Message
-from circleback.pipeline.prefilter import should_process_message
-from circleback.pipeline.extractor import extract_commitments_from_message
-from circleback.pipeline.temporal import resolve_deadline
-from circleback.pipeline.linker import link_thread_and_entities
-from circleback.pipeline.fulfillment import process_thread_fulfillment
-from circleback.pipeline.status import update_commitment_statuses
 
+if TYPE_CHECKING:
+    from langchain_core.runnables import RunnableConfig
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 # ── Pipeline State Definition ─────────────────────────────────
 
@@ -175,10 +178,10 @@ async def status_node(state: PipelineState, config: RunnableConfig) -> dict[str,
     """
     db: AsyncSession = config["configurable"]["db"]
     user_id = config["configurable"].get("user_id") or state.get("user_id")
-    
+
     from circleback.config import get_settings
     at_risk_hours = get_settings().at_risk_hours_before_deadline
-    
+
     await update_commitment_statuses(db, at_risk_hours=at_risk_hours, user_id=user_id)
     return {"processing_complete": True}
 
@@ -194,7 +197,7 @@ async def digest_node(state: PipelineState, config: RunnableConfig) -> dict[str,
 
 def correction_node(state: PipelineState, config: RunnableConfig) -> dict[str, Any]:
     """Human correction loop node using LangGraph interrupt.
-    
+
     Pauses execution to allow user to provide corrections for any commitments.
     When resumed with a correction payload, applies the correction.
     """

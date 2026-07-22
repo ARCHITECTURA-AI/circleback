@@ -7,7 +7,6 @@ are resolved into timezone-aware datetime deadlines against message send timesta
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import pytest
 
 from circleback.pipeline.temporal import resolve_deadline
 

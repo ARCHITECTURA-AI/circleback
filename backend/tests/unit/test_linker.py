@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import select
 
-from circleback.db.models import ChannelType, Person, Thread, Message
+from circleback.db.models import ChannelType, Thread
 from circleback.pipeline.linker import link_thread_and_entities
 from tests.conftest import make_message, make_person
 

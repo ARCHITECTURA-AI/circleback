@@ -14,13 +14,15 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING, Any
 
 from circleback.db.models import ChannelType, Message
-from circleback.pipeline.prefilter import should_process_message
-from circleback.pipeline.extractor import extract_commitments_from_message
 from circleback.eval.metrics import calculate_metrics
+from circleback.pipeline.extractor import extract_commitments_from_message
+from circleback.pipeline.prefilter import should_process_message
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +43,9 @@ async def run_evaluation(db: AsyncSession, limit: int | None = None, user_id: st
     - Type accuracy (when commitment is correctly detected)
     - Example successes and failures for honest reporting (spec §12)
     """
-    from circleback.db.models import User
     from sqlalchemy import select
+
+    from circleback.db.models import User
 
     resolved_user_id = user_id
     if not resolved_user_id:

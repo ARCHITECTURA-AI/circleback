@@ -5,21 +5,21 @@ TDD: These tests define the API contract.
 
 from __future__ import annotations
 
-import pytest
+from typing import TYPE_CHECKING
 from unittest.mock import patch
-from httpx import AsyncClient
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import (
     Commitment,
     CommitmentDirection,
     CommitmentStatus,
-    CommitmentType,
-    Person,
 )
 from tests.conftest import make_commitment, make_person
 
+if TYPE_CHECKING:
+    from httpx import AsyncClient
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 # ── Health Check ──────────────────────────────────────────────
 

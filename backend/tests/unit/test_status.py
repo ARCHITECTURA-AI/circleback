@@ -7,12 +7,13 @@ based on approaching or passed deadlines, and verify audit trail creation.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+
 import pytest
 from sqlalchemy import select
 
-from circleback.db.models import CommitmentStatus, CommitmentEventType, CommitmentEvent
+from circleback.db.models import CommitmentEvent, CommitmentEventType, CommitmentStatus
 from circleback.pipeline.status import update_commitment_statuses
-from tests.conftest import make_commitment, MOCK_USER_ID
+from tests.conftest import MOCK_USER_ID, make_commitment
 
 
 class TestStatusEngine:

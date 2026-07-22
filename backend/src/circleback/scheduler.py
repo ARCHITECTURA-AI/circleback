@@ -13,18 +13,17 @@ Design decisions:
 from __future__ import annotations
 
 import logging
-from contextlib import asynccontextmanager
-from collections.abc import AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
 
 async def _run_digest_for_all_users() -> None:
     """Run digest generation for every active user."""
+    from sqlalchemy import select
+
     from circleback.db import async_session_factory
     from circleback.db.models import User
     from circleback.pipeline.digest import generate_digest
-    from sqlalchemy import select
 
     async with async_session_factory() as db:
         try:

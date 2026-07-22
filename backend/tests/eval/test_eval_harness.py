@@ -7,11 +7,11 @@ and reports regressions if quality drops.
 
 from __future__ import annotations
 
-import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
-from circleback.eval.harness import run_evaluation, load_fixtures
-from circleback.db.models import CommitmentType
+import pytest
+
+from circleback.eval.harness import load_fixtures, run_evaluation
 
 
 def test_eval_harness_loads_fixtures() -> None:

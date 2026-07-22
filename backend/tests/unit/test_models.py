@@ -7,13 +7,12 @@ Every model, enum, relationship, and constraint is tested.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import (
-    Base,
     ChannelType,
     Commitment,
     CommitmentDirection,
@@ -27,13 +26,15 @@ from circleback.db.models import (
     Thread,
 )
 from tests.conftest import (
+    MOCK_USER_ID,
     make_commitment,
     make_commitment_event,
     make_message,
     make_person,
-    MOCK_USER_ID,
 )
 
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 # ── Person Tests ──────────────────────────────────────────────
 

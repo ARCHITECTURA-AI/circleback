@@ -12,10 +12,10 @@ Design decisions:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, Field
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import (
     Commitment,
@@ -27,7 +27,9 @@ from circleback.db.models import (
     Message,
     Person,
 )
-from circleback.pipeline.text_utils import strip_quoted_content
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 

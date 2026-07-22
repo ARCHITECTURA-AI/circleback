@@ -9,17 +9,16 @@ tables for multi-tenant data isolation. Also adds `sender_handle` to
 messages (missing from initial migration) and fixes the
 `external_message_id` unique constraint to be scoped per-user.
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'a3b4c5d6e7f8'
-down_revision: Union[str, Sequence[str], None] = '9e8a5b2c9101'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = '9e8a5b2c9101'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 # Sentinel user for backfilling existing rows
 SENTINEL_USER_ID = '00000000-0000-0000-0000-000000000001'

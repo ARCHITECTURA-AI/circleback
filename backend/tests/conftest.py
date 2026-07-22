@@ -10,8 +10,8 @@ Provides:
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
 
 import pytest
 import pytest_asyncio
@@ -22,6 +22,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from circleback.api.session import get_current_user
+from circleback.db import get_db
 from circleback.db.models import (
     Base,
     ChannelType,
@@ -33,13 +35,12 @@ from circleback.db.models import (
     CommitmentType,
     Message,
     Person,
-    Thread,
     User,
 )
 from circleback.main import create_app
-from circleback.db import get_db
-from circleback.api.session import get_current_user
 
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 # ── Async engine for tests (SQLite in-memory) ────────────────
 

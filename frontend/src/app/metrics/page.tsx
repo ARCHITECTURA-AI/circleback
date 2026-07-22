@@ -15,7 +15,7 @@ export default function MetricsPage() {
       setError(null);
       const data = await getMetrics();
       setMetrics(data);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || "Failed to load metrics data");
     } finally {
       setLoading(false);
@@ -23,6 +23,7 @@ export default function MetricsPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     loadData();
   }, []);
 

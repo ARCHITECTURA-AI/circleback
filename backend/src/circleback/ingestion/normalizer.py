@@ -7,8 +7,8 @@ and link information, formatting them consistently.
 from __future__ import annotations
 
 import base64
+import contextlib
 import email.utils
-import re
 from datetime import datetime, timezone
 from typing import Any
 
@@ -56,12 +56,10 @@ def decode_gmail_body(payload: dict[str, Any]) -> str:
             part_body = part.get("body", {})
             part_data = part_body.get("data", "")
             if part_data:
-                try:
+                with contextlib.suppress(Exception):
                     text_content.append(
                         base64.urlsafe_b64decode(part_data.encode("utf-8")).decode("utf-8")
                     )
-                except Exception:
-                    pass
         elif part.get("parts"):
             text_content.append(decode_gmail_body(part))
 
@@ -92,7 +90,7 @@ def normalize_gmail_message(raw_gmail: dict[str, Any]) -> Message:
         body_text = raw_gmail.get("snippet", "")
 
     # For Gmail, subject is useful metadata
-    subject = get_gmail_header(headers, "Subject")
+    get_gmail_header(headers, "Subject")
 
     # In normalizer, we populate recipient_person_ids with the raw email strings.
     # The Entity Linker phase will resolve these to Person foreign keys later.
@@ -121,7 +119,7 @@ def normalize_slack_message(
     sender_slack_id = raw_slack.get("user", "")
 
     # For Slack, the thread_ts groups replies. If no thread_ts, it's just ts.
-    thread_ts = raw_slack.get("thread_ts", ts)
+    raw_slack.get("thread_ts", ts)
 
     # In Slack, recipients are the other participants in the channel or conversation.
     recipients = list(team_members) if team_members else []

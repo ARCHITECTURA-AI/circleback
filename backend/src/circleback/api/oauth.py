@@ -12,20 +12,22 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from sqlalchemy import select, delete
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete, select
 
+from circleback.api.session import create_session, get_current_user
 from circleback.config import get_settings
 from circleback.db import get_db
 from circleback.db.models import OAuthToken
-from circleback.encryption import encrypt_token, decrypt_token
-from circleback.api.session import create_session, get_current_user
+from circleback.encryption import encrypt_token
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +90,7 @@ async def google_callback(
 ) -> RedirectResponse:
     """Handle Google OAuth callback — exchange code for tokens, store encrypted, and create session."""
     import httpx
+
     from circleback.db.models import User
 
     settings = get_settings()
@@ -206,6 +209,7 @@ async def slack_callback(
 ) -> RedirectResponse:
     """Handle Slack OAuth callback — exchange code for token, store encrypted, and create session."""
     import httpx
+
     from circleback.db.models import User
 
     settings = get_settings()

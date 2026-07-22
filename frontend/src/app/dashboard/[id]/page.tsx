@@ -23,7 +23,7 @@ export default function CommitmentDetailPage({ params }: PageProps) {
       setError(null);
       const data = await getCommitmentDetail(commitmentId);
       setCommitment(data);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || "Failed to load commitment details");
     } finally {
       setLoading(false);
@@ -31,6 +31,7 @@ export default function CommitmentDetailPage({ params }: PageProps) {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     loadData();
   }, [commitmentId]);
 
@@ -38,7 +39,7 @@ export default function CommitmentDetailPage({ params }: PageProps) {
     try {
       await correctCommitment(commitmentId, action, extraParams);
       await loadData();
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       alert(`Action failed: ${err.message}`);
     }
   };

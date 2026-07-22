@@ -40,8 +40,4 @@ def should_process_message(text: str) -> bool:
         return False
 
     # Check if any pattern matches
-    for pattern in PATTERNS_RE:
-        if pattern.search(text):
-            return True
-
-    return False
+    return any(pattern.search(text) for pattern in PATTERNS_RE)

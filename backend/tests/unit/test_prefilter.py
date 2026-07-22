@@ -6,8 +6,6 @@ The prefilter blocks obvious non-commitments to save LLM costs and latency.
 
 from __future__ import annotations
 
-import pytest
-
 from circleback.pipeline.prefilter import should_process_message
 
 

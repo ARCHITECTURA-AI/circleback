@@ -1,21 +1,21 @@
 """initial
 
 Revision ID: 0c7cc2a37599
-Revises: 
+Revises:
 Create Date: 2026-07-13 11:32:08.133787
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = '0c7cc2a37599'
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -24,8 +24,8 @@ def upgrade() -> None:
     op.create_table('persons',
     sa.Column('id', sa.UUID(as_uuid=False), nullable=False),
     sa.Column('display_name', sa.String(length=255), nullable=False),
-    sa.Column('email_addresses', sa.JSON().with_variant(postgresql.JSONB(astext_type=Text()), 'postgresql'), server_default='[]', nullable=False),
-    sa.Column('slack_user_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=Text()), 'postgresql'), server_default='[]', nullable=False),
+    sa.Column('email_addresses', sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), 'postgresql'), server_default='[]', nullable=False),
+    sa.Column('slack_user_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), 'postgresql'), server_default='[]', nullable=False),
     sa.Column('is_self', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -34,7 +34,7 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(as_uuid=False), nullable=False),
     sa.Column('channel', sa.Enum('EMAIL', 'SLACK', name='channel_type', create_constraint=True), nullable=False),
     sa.Column('external_thread_id', sa.String(length=255), nullable=True),
-    sa.Column('participant_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=Text()), 'postgresql'), server_default='[]', nullable=False),
+    sa.Column('participant_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), 'postgresql'), server_default='[]', nullable=False),
     sa.Column('subject_or_topic', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -46,7 +46,7 @@ def upgrade() -> None:
     sa.Column('external_message_id', sa.String(length=255), nullable=True),
     sa.Column('thread_id', sa.UUID(as_uuid=False), nullable=True),
     sa.Column('sender_person_id', sa.UUID(as_uuid=False), nullable=True),
-    sa.Column('recipient_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=Text()), 'postgresql'), server_default='[]', nullable=False),
+    sa.Column('recipient_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), 'postgresql'), server_default='[]', nullable=False),
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=False),
     sa.Column('raw_text', sa.Text(), nullable=False),
     sa.Column('permalink', sa.String(length=2048), nullable=True),
@@ -63,7 +63,7 @@ def upgrade() -> None:
     sa.Column('source_message_id', sa.UUID(as_uuid=False), nullable=True),
     sa.Column('thread_id', sa.UUID(as_uuid=False), nullable=True),
     sa.Column('committer_person_id', sa.UUID(as_uuid=False), nullable=True),
-    sa.Column('recipient_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=Text()), 'postgresql'), server_default='[]', nullable=False),
+    sa.Column('recipient_person_ids', sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), 'postgresql'), server_default='[]', nullable=False),
     sa.Column('direction', sa.Enum('MADE_BY_USER', 'OWED_TO_USER', name='commitment_direction', create_constraint=True), nullable=False),
     sa.Column('raw_text_span', sa.Text(), nullable=False),
     sa.Column('commitment_type', sa.Enum('SIMPLE', 'DELEGATED', 'CONDITIONAL', 'RECURRING', name='commitment_type', create_constraint=True), nullable=False),

@@ -145,10 +145,7 @@ def resolve_deadline(phrase: str, anchor: datetime) -> dict[str, Any]:
     if in_days_match:
         n = int(in_days_match.group(1))
         is_business = bool(in_days_match.group(2)) or "working" in cleaned
-        if is_business:
-            deadline = _next_business_day(anchor, n)
-        else:
-            deadline = anchor + timedelta(days=n)
+        deadline = _next_business_day(anchor, n) if is_business else anchor + timedelta(days=n)
         deadline = deadline.replace(hour=18, minute=0, second=0, microsecond=0)
         return {"deadline": deadline, "confidence": 0.85}
 

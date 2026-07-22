@@ -1,5 +1,5 @@
-import pytest
 from circleback.pipeline.text_utils import strip_quoted_content
+
 
 def test_strip_standard_quotes():
     text = "Sounds good to me.\n> I'll send it by Friday.\n> Thanks!"

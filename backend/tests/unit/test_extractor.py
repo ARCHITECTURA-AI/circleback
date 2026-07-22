@@ -6,8 +6,9 @@ direction, confidence scores, types, and excluding non-commitments.
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import MagicMock, patch
 
 from circleback.db.models import ChannelType, CommitmentDirection, CommitmentStatus, CommitmentType
 from circleback.pipeline.extractor import extract_commitments_from_message
@@ -51,7 +52,7 @@ class TestLLMCommitmentExtraction:
 
         # Run extraction
         commitments = await extract_commitments_from_message(db_session, msg, self_email="self@company.com")
-        
+
         assert len(commitments) == 1
         c = commitments[0]
         assert c.raw_text_span == "I'll send you the deck by Friday"

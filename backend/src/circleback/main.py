@@ -10,19 +10,20 @@ import logging
 import sys
 import time
 from collections import defaultdict
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from circleback.config import get_settings
-from circleback.api.health import router as health_router
-from circleback.api.commitments import router as commitments_router
-from circleback.api.persons import router as persons_router
 from circleback.api.auth import router as auth_router
+from circleback.api.commitments import router as commitments_router
+from circleback.api.health import router as health_router
 from circleback.api.oauth import router as oauth_router
+from circleback.api.persons import router as persons_router
 from circleback.api.sync import router as sync_router
-
+from circleback.config import get_settings
 
 # ── Structured Logging ────────────────────────────────────────
 
@@ -80,8 +81,10 @@ def _is_rate_limited(client_ip: str) -> bool:
 # ── App Factory ───────────────────────────────────────────────
 
 
-from contextlib import asynccontextmanager
-from collections.abc import AsyncGenerator
+
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 @asynccontextmanager

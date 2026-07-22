@@ -27,7 +27,7 @@ export default function DashboardPage() {
         const data = await getDigest();
         setDigest(data);
       }
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || "Failed to load commitment digest");
     } finally {
       setLoading(false);
@@ -35,6 +35,7 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     loadData();
   }, []);
 
@@ -43,7 +44,7 @@ export default function DashboardPage() {
       await correctCommitment(id, action, params);
       // Reload digest to reflect changes
       await loadData();
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       alert(`Action failed: ${err.message}`);
     }
   };

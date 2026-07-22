@@ -8,12 +8,20 @@ the correct order and updates database state reliably.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-import pytest
 from unittest.mock import patch
 
-from circleback.db.models import ChannelType, CommitmentDirection, CommitmentStatus, CommitmentType, Person, Thread, Commitment
+import pytest
+
+from circleback.db.models import (
+    ChannelType,
+    Commitment,
+    CommitmentDirection,
+    CommitmentStatus,
+    CommitmentType,
+    Thread,
+)
 from circleback.pipeline.graph import compile_pipeline_graph
-from tests.conftest import make_message, make_person, MOCK_USER_ID
+from tests.conftest import MOCK_USER_ID, make_message, make_person
 
 
 class TestPipelineE2E:
@@ -63,7 +71,7 @@ class TestPipelineE2E:
 
         # 5. Compile and invoke the LangGraph pipeline
         graph = compile_pipeline_graph()
-        
+
         # Invoke the graph with the initial state
         initial_state = {
             "user_id": MOCK_USER_ID,
@@ -71,14 +79,14 @@ class TestPipelineE2E:
             "external_thread_id": "thread_e2e_123",
             "self_email": "me@company.com"
         }
-        
+
         await graph.ainvoke(initial_state, {"configurable": {"thread_id": msg.id, "db": db_session, "user_id": MOCK_USER_ID}})
 
         # 6. Verify database side effects
         from sqlalchemy import select
         res = await db_session.execute(select(Commitment).where(Commitment.source_message_id == msg.id))
         commitments = res.scalars().all()
-        
+
         assert len(commitments) == 1
         c = commitments[0]
         assert c.raw_text_span == "I will deliver the monthly reports by tomorrow"

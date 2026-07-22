@@ -8,12 +8,15 @@ prevent silent data loss.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import Commitment, CommitmentEvent, CommitmentEventType, Message
 from circleback.ingestion.normalizer import normalize_gmail_message
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DummyGmailClient:
@@ -70,7 +73,7 @@ async def ingest_single_gmail_message(db: AsyncSession, message_id: str, user_id
 
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
+    self_res = await db.execute(select(Person).where(Person.is_self, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 
@@ -129,7 +132,7 @@ async def sync_gmail(db: AsyncSession, user_id: str, last_history_id: str | None
                 msg = res.scalar_one_or_none()
                 if msg:
                     msg.deleted_at = datetime.now(timezone.utc)
-                    
+
                     # Create RETRACTED_SOURCE CommitmentEvent for all linked commitments
                     c_res = await db.execute(select(Commitment).where(Commitment.source_message_id == msg.id, Commitment.user_id == user_id))
                     commitments = c_res.scalars().all()

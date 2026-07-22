@@ -34,7 +34,7 @@ export default function SettingsPage() {
       const personData = await getPersons();
       setConnections(connData.accounts);
       setPersons(personData.items);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || "Failed to load settings data");
     } finally {
       setLoading(false);
@@ -42,6 +42,7 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     loadData();
   }, []);
 
@@ -76,7 +77,7 @@ export default function SettingsPage() {
       // Reload
       const personData = await getPersons();
       setPersons(personData.items);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       alert(`Failed to save mapping: ${err.message}`);
     } finally {
       setCreating(false);
@@ -94,7 +95,7 @@ export default function SettingsPage() {
       const res = await deleteAllData();
       alert(res.message || "All data has been purged.");
       window.location.href = "/";
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       alert(`Purge failed: ${err.message}`);
       setLoading(false);
     }

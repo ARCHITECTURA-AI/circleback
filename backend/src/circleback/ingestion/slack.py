@@ -7,12 +7,20 @@ normalizing them into the Message model.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING, Any
 
-from circleback.db.models import ChannelType, Commitment, CommitmentEvent, CommitmentEventType, Message
+from sqlalchemy import select
+
+from circleback.db.models import (
+    Commitment,
+    CommitmentEvent,
+    CommitmentEventType,
+    Message,
+)
 from circleback.ingestion.normalizer import normalize_slack_message
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DummySlackClient:
@@ -35,7 +43,7 @@ async def sync_slack_channel(
     """Sync full history of a Slack channel using cursor pagination."""
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
+    self_res = await db.execute(select(Person).where(Person.is_self, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 
@@ -84,7 +92,7 @@ async def handle_slack_event(db: AsyncSession, event: dict[str, Any], user_id: s
     """Process a real-time event from the Slack Events API."""
     # Find self email to determine commitment direction
     from circleback.db.models import Person
-    self_res = await db.execute(select(Person).where(Person.is_self == True, Person.user_id == user_id))
+    self_res = await db.execute(select(Person).where(Person.is_self, Person.user_id == user_id))
     self_person = self_res.scalar_one_or_none()
     self_email = self_person.email_addresses[0] if (self_person and self_person.email_addresses) else ""
 

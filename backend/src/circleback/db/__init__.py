@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -11,6 +11,9 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from circleback.config import get_settings
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 def _build_engine(database_url: str | None = None):  # type: ignore[no-untyped-def]

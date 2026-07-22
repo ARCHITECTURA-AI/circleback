@@ -12,10 +12,10 @@ Design decisions:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from datetime import datetime
+from typing import TYPE_CHECKING, Any
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from circleback.db.models import (
     Commitment,
@@ -24,8 +24,10 @@ from circleback.db.models import (
     CommitmentEventType,
     CommitmentStatus,
     EvalLabel,
-    Message,
 )
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 

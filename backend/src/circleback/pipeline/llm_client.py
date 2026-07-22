@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel
 
@@ -98,7 +98,7 @@ async def call_claude_structured(
     ]
 
     from typing import cast
-    result = cast(T, structured_llm.invoke(messages))
+    result = cast("T", structured_llm.invoke(messages))
 
     # Estimate token usage (rough: 4 chars ≈ 1 token)
     input_tokens = (len(system_prompt) + len(user_message)) // 4

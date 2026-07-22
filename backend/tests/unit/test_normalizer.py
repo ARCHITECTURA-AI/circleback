@@ -6,9 +6,6 @@ into the unified Message model.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-import pytest
-
 from circleback.db.models import ChannelType
 from circleback.ingestion.normalizer import normalize_gmail_message, normalize_slack_message
 

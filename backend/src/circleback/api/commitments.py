@@ -6,20 +6,23 @@ the low-confidence review queue, and evaluation metrics.
 
 from __future__ import annotations
 
-from typing import Any
 import logging
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException
+from typing import TYPE_CHECKING, Any
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from langgraph.types import Command
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from circleback.api.session import get_current_user
 from circleback.db import get_db
 from circleback.db.models import Commitment, CommitmentDirection, CommitmentStatus
-from circleback.pipeline.digest import apply_commitment_correction
 from circleback.eval.harness import run_evaluation
-from circleback.api.session import get_current_user
-from circleback.pipeline.graph import compile_digest_graph, compile_pipeline_graph
-from langgraph.types import Command
+from circleback.pipeline.digest import apply_commitment_correction
+from circleback.pipeline.graph import compile_digest_graph
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -176,7 +179,7 @@ async def correct_commitment(
     user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, str]:
     """Apply manual user correction (e.g. done, dismiss, postpone) to a commitment.
-    
+
     This also resumes the LangGraph correction node if it was interrupted (spec §6.9).
     """
     # 1. Lookup commitment to get the source message ID (which is the LangGraph thread_id)
@@ -272,7 +275,7 @@ async def get_commitment_detail(
     )
 
 
-import time
+import time  # noqa: E402
 
 # Module-level metrics cache keyed by user_id (Phase 4)
 _metrics_cache: dict[str, dict[str, Any]] = {}
@@ -288,11 +291,11 @@ async def get_metrics(
     """Retrieve scores computed by the evaluation harness from cache."""
     uid = user["user_id"]
     now = time.time()
-    
+
     # Return cache if valid for this user
     if uid in _metrics_cache and (now - _metrics_cache_timestamps.get(uid, 0)) < _METRICS_CACHE_TTL:
         return _metrics_cache[uid]
-        
+
     return {
         "status": "no_cached_results",
         "message": "No cached metrics available or cache expired. Run POST /api/v1/metrics/refresh to generate."
@@ -302,6 +305,7 @@ async def get_metrics(
 def _run_evaluation_sync(user_id: str) -> None:
     """Run evaluation in background and cache results."""
     import asyncio
+
     from circleback.db import async_session_factory
 
     async def _inner() -> None:

@@ -10,7 +10,7 @@ export default function TermsPage() {
 
       <h2>1. Nature of the Service</h2>
       <p>
-        Circle Back is a personal/portfolio project designed to track commitments across connected platforms (e.g., Gmail, Slack). It is provided "as is" without any warranties of any kind. 
+        Circle Back is a personal/portfolio project designed to track commitments across connected platforms (e.g., Gmail, Slack). It is provided &quot;as is&quot; without any warranties of any kind. 
       </p>
 
       <h2>2. Disclaimer of Liability</h2>
@@ -23,7 +23,7 @@ export default function TermsPage() {
 
       <h2>3. Acceptable Use</h2>
       <p>
-        You agree to only connect accounts that you have the legal right to access and process. You are responsible for ensuring that your use of Circle Back complies with your employer's policies or any other applicable agreements regarding data privacy and third-party AI processing.
+        You agree to only connect accounts that you have the legal right to access and process. You are responsible for ensuring that your use of Circle Back complies with your employer&apos;s policies or any other applicable agreements regarding data privacy and third-party AI processing.
       </p>
 
       <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">

@@ -7,17 +7,18 @@ and verify the correction loop actions (done, dismiss, new_deadline).
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+
 import pytest
 from sqlalchemy import select
 
 from circleback.db.models import (
     CommitmentDirection,
-    CommitmentStatus,
-    CommitmentEventType,
     CommitmentEvent,
+    CommitmentEventType,
+    CommitmentStatus,
 )
-from circleback.pipeline.digest import generate_digest, apply_commitment_correction
-from tests.conftest import make_commitment, MOCK_USER_ID
+from circleback.pipeline.digest import apply_commitment_correction, generate_digest
+from tests.conftest import MOCK_USER_ID, make_commitment
 
 
 class TestDigestAndCorrection:
@@ -42,7 +43,7 @@ class TestDigestAndCorrection:
         await db_session.commit()
 
         digest = await generate_digest(db_session, user_id=MOCK_USER_ID)
-        
+
         # Verify structure
         assert "made_by_user" in digest
         assert "owed_to_user" in digest

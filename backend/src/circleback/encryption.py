@@ -7,6 +7,7 @@ at rest, never logged, minimally scoped.
 from __future__ import annotations
 
 import logging
+
 from cryptography.fernet import Fernet, InvalidToken
 
 logger = logging.getLogger(__name__)

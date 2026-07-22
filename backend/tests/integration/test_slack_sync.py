@@ -6,13 +6,13 @@ message edits, deletes) and verify webhook signatures.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-import pytest
 from unittest.mock import MagicMock, patch
 
-from circleback.db.models import ChannelType, Message
+import pytest
+
+from circleback.db.models import ChannelType
 from circleback.ingestion.slack import handle_slack_event, sync_slack_channel
-from tests.conftest import make_message, MOCK_USER_ID
+from tests.conftest import MOCK_USER_ID, make_message
 
 
 class TestSlackIngestion:

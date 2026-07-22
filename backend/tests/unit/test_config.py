@@ -7,8 +7,6 @@ TDD: These tests define the config contract.
 
 from __future__ import annotations
 
-import os
-
 import pytest
 from pydantic import ValidationError
 

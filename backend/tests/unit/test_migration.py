@@ -8,11 +8,10 @@ to missing tables, column type mismatches, etc.
 from __future__ import annotations
 
 import pytest
-import pytest_asyncio
-from sqlalchemy import inspect, select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import create_async_engine
 
-from circleback.db.models import Base, User
+from circleback.db.models import Base
 
 
 @pytest.mark.asyncio

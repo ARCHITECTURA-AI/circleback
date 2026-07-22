@@ -7,20 +7,20 @@ commitments on a thread, how renegotiations update deadlines, and how audit trai
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import pytest
 from unittest.mock import patch
+
+import pytest
 from sqlalchemy import select
 
 from circleback.db.models import (
     ChannelType,
-    CommitmentStatus,
-    CommitmentEventType,
-    Message,
-    Thread,
     CommitmentEvent,
+    CommitmentEventType,
+    CommitmentStatus,
+    Thread,
 )
 from circleback.pipeline.fulfillment import process_thread_fulfillment
-from tests.conftest import make_commitment, make_message, MOCK_USER_ID
+from tests.conftest import MOCK_USER_ID, make_commitment, make_message
 
 
 class TestFulfillmentMatcher:
@@ -68,7 +68,7 @@ class TestFulfillmentMatcher:
 
         await db_session.refresh(c)
         assert c.status == CommitmentStatus.FULFILLED
-        
+
         # Verify event was recorded by querying directly
         res_events = await db_session.execute(
             select(CommitmentEvent).where(CommitmentEvent.commitment_id == c.id)
@@ -157,7 +157,7 @@ class TestFulfillmentMatcher:
         assert c.resolved_deadline is not None
         assert c.resolved_deadline.day == 20
         assert c.resolved_deadline.month == 10
-        
+
         # Verify audit trail event by querying directly
         res_events = await db_session.execute(
             select(CommitmentEvent).where(CommitmentEvent.commitment_id == c.id)

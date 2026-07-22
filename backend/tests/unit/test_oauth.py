@@ -7,14 +7,15 @@ same email → same user.
 
 from __future__ import annotations
 
-import pytest
-import pytest_asyncio
-from unittest.mock import AsyncMock, patch, MagicMock
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
 
-from circleback.db.models import User, OAuthToken
-from tests.conftest import MOCK_USER_ID
+import pytest
+from sqlalchemy import select
+
+from circleback.db.models import User
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.asyncio

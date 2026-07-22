@@ -7,12 +7,13 @@ manage edited/deleted emails, and encrypt/decrypt OAuth credentials.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
-from circleback.db.models import ChannelType, CommitmentStatus, Message, Person
+import pytest
+
+from circleback.db.models import ChannelType
 from circleback.ingestion.gmail import sync_gmail
-from tests.conftest import make_commitment, make_message, make_person, MOCK_USER_ID
+from tests.conftest import MOCK_USER_ID, make_message
 
 
 class TestGmailIngestion:
@@ -27,18 +28,18 @@ class TestGmailIngestion:
         # Setup mocks
         mock_client = MagicMock()
         mock_build_client.return_value = mock_client
-        
+
         # Mock list/history responses
         mock_client.users().history().list.return_value.execute = MagicMock(return_value={
             "history": [],
             "historyId": "9999"
         })
-        
+
         # Run sync first time (full backfill/start)
         # In a real sync we might store history_id in a sync state or token record.
         # Let's say we pass the last history_id or keep it in a session.
         await sync_gmail(db_session, user_id=MOCK_USER_ID, last_history_id="12345")
-        
+
         # Verify the history list was called with startHistoryId="12345"
         mock_client.users().history().list.assert_called_with(
             userId="me",
@@ -104,7 +105,7 @@ class TestGmailIngestion:
         # Let's say sync_gmail processes a history payload containing a deleted message.
         mock_client = MagicMock()
         mock_build_client.return_value = mock_client
-        
+
         # Return history with a messageDeleted element
         mock_client.users().history().list.return_value.execute = MagicMock(return_value={
             "history": [
