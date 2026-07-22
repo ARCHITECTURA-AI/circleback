@@ -85,7 +85,7 @@ async def call_claude_structured(
     from langchain_anthropic import ChatAnthropic
 
     llm = ChatAnthropic(
-        model=model,
+        model_name=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
@@ -97,7 +97,8 @@ async def call_claude_structured(
         ("human", user_message),
     ]
 
-    result = structured_llm.invoke(messages)
+    from typing import cast
+    result = cast(T, structured_llm.invoke(messages))
 
     # Estimate token usage (rough: 4 chars ≈ 1 token)
     input_tokens = (len(system_prompt) + len(user_message)) // 4
@@ -119,7 +120,7 @@ async def call_claude_raw(
     from langchain_anthropic import ChatAnthropic
 
     llm = ChatAnthropic(
-        model=model,
+        model_name=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
@@ -130,7 +131,18 @@ async def call_claude_raw(
     ]
 
     response = llm.invoke(messages)
-    content = response.content if hasattr(response, "content") else str(response)
+    content_raw = response.content if hasattr(response, "content") else str(response)
+
+    if isinstance(content_raw, list):
+        text_parts = []
+        for block in content_raw:
+            if isinstance(block, str):
+                text_parts.append(block)
+            elif isinstance(block, dict) and "text" in block:
+                text_parts.append(str(block["text"]))
+        content = "".join(text_parts)
+    else:
+        content = content_raw
 
     # Cost tracking
     input_tokens = (len(system_prompt) + len(user_message)) // 4

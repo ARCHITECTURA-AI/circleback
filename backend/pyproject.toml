@@ -19,6 +19,7 @@ dependencies = [
     "cryptography>=44.0.0",
     "itsdangerous>=2.2.0",
     "python-multipart>=0.0.12",
+    "apscheduler>=3.10.0",
 ]
 
 [project.optional-dependencies]
