@@ -2,7 +2,7 @@
 
 Tests:
 1. Structured extraction — send a message with a commitment, get ExtractionResult back
-2. Structured fulfillment — send open commitments + follow-up, get FulfillmentResult back  
+2. Structured fulfillment — send open commitments + follow-up, get FulfillmentResult back
 3. Raw text call — simple prompt, get string back
 4. Non-commitment rejection — verify a non-commitment message returns empty
 5. Cost tracking — verify cost tracking is working
@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 # Load .env
 from dotenv import load_dotenv
+
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 
@@ -32,8 +33,8 @@ async def main() -> None:
     # Verify config loads correctly
     from circleback.config import get_settings
     settings = get_settings()
-    
-    print(f"\n📋 Config:")
+
+    print("\n📋 Config:")
     print(f"   Provider:    {settings.llm_provider}")
     print(f"   Model:       {settings.llm_model}")
     print(f"   API Key:     {settings.groq_api_key[:12]}...{'*' * 20}")
@@ -43,9 +44,13 @@ async def main() -> None:
         print("\n❌ GROQ_API_KEY is not set in .env — aborting.")
         sys.exit(1)
 
-    from circleback.pipeline.llm_client import call_llm_structured, call_llm_raw, reset_cost_tracking
-    from circleback.pipeline.extractor import ExtractionResult, EXTRACTION_SYSTEM_PROMPT
-    from circleback.pipeline.fulfillment import FulfillmentResult, FULFILLMENT_SYSTEM_PROMPT
+    from circleback.pipeline.extractor import EXTRACTION_SYSTEM_PROMPT, ExtractionResult
+    from circleback.pipeline.fulfillment import FULFILLMENT_SYSTEM_PROMPT, FulfillmentResult
+    from circleback.pipeline.llm_client import (
+        call_llm_raw,
+        call_llm_structured,
+        reset_cost_tracking,
+    )
 
     reset_cost_tracking()
     passed = 0
@@ -72,7 +77,7 @@ async def main() -> None:
             print(f"        temporal: {c.raw_temporal_phrase}")
             print(f"        confidence: {c.extraction_confidence}")
             print(f"        reasoning: {c.reasoning[:80]}")
-        
+
         if result.commitments and result.commitments[0].is_commitment:
             print("   ✅ PASS — Correctly identified as a commitment")
             passed += 1
@@ -97,7 +102,7 @@ async def main() -> None:
             daily_cost_limit=settings.llm_daily_cost_limit_usd,
         )
         print(f"   ✅ Got ExtractionResult with {len(result.commitments)} commitment(s)")
-        
+
         real_commitments = [c for c in result.commitments if c.is_commitment]
         if len(real_commitments) == 0:
             print("   ✅ PASS — Correctly rejected non-commitment (past-tense)")
