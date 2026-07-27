@@ -27,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
-      <head>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-      </head>
+
       <body className="min-h-full bg-white font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100">
         {children}
       </body>

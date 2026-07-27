@@ -15,7 +15,7 @@ export default function ProblemSection() {
                     >
                         <h2 className="font-headline-lg text-headline-lg mb-md">Entropy is the Enemy.</h2>
                         <p className="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed">
-                            Productivity tools fail because they rely on manual entry. If it isn't in the system, it doesn't exist. But in high-stakes environments, commitments happen in the flow of conversation, then vanish into the scroll.
+                            Productivity tools fail because they rely on manual entry. If it isn&apos;t in the system, it doesn&apos;t exist. But in high-stakes environments, commitments happen in the flow of conversation, then vanish into the scroll.
                         </p>
                         <div className="space-y-md">
                             <motion.div whileHover={{ scale: 1.02 }} className="flex gap-md items-start p-sm -ml-sm rounded-lg hover:bg-surface-container-high transition-colors">
@@ -24,7 +24,7 @@ export default function ProblemSection() {
                                 </div>
                                 <div>
                                     <h4 className="font-headline-md text-headline-md mb-xs">Context Collapse</h4>
-                                    <p className="text-on-surface-variant text-body-sm">Threads grow too long. Important promises are buried under "Thanks!" and "Received."</p>
+                                    <p className="text-on-surface-variant text-body-sm">Threads grow too long. Important promises are buried under &quot;Thanks!&quot; and &quot;Received.&quot;</p>
                                 </div>
                             </motion.div>
                             <motion.div whileHover={{ scale: 1.02 }} className="flex gap-md items-start p-sm -ml-sm rounded-lg hover:bg-surface-container-high transition-colors">
@@ -33,7 +33,7 @@ export default function ProblemSection() {
                                 </div>
                                 <div>
                                     <h4 className="font-headline-md text-headline-md mb-xs">Precision Over Recall</h4>
-                                    <p className="text-on-surface-variant text-body-sm">We don't summarize everything. We only isolate the commitments that matter, with 99.9% accuracy.</p>
+                                    <p className="text-on-surface-variant text-body-sm">We don&apos;t summarize everything. We only isolate the commitments that matter, with 99.9% accuracy.</p>
                                 </div>
                             </motion.div>
                         </div>

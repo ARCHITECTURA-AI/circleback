@@ -49,7 +49,7 @@ export default function HeroSection() {
                         <div className="space-y-sm relative z-10">
                             <div className="p-sm bg-surface-container-lowest/50 rounded-lg border border-outline-variant/20 hover:border-primary/50 transition-colors">
                                 <div className="flex justify-between items-start mb-xs">
-                                    <span className="font-mono-code text-mono-code text-primary text-xs">@user_slack_id: "I'll have that report by EOD Friday."</span>
+                                    <span className="font-mono-code text-mono-code text-primary text-xs">@user_slack_id: &quot;I&apos;ll have that report by EOD Friday.&quot;</span>
                                 </div>
                                 <div className="font-mono-code text-mono-code text-[11px] text-on-surface-variant bg-background p-xs rounded">
                                     {'{ "type": "COMMITMENT", "state": "OPEN", "confidence": 0.98, "deadline": "2024-10-25T17:00:00Z" }'}
@@ -57,7 +57,7 @@ export default function HeroSection() {
                             </div>
                             <div className="p-sm bg-surface-container-lowest/50 rounded-lg border border-outline-variant/20 opacity-60 hover:opacity-100 hover:border-tertiary/50 transition-all">
                                 <div className="flex justify-between items-start mb-xs">
-                                    <span className="font-mono-code text-mono-code text-tertiary text-xs">Gmail: "Attached is the contract you requested."</span>
+                                    <span className="font-mono-code text-mono-code text-tertiary text-xs">Gmail: &quot;Attached is the contract you requested.&quot;</span>
                                 </div>
                                 <div className="font-mono-code text-mono-code text-[11px] text-on-surface-variant bg-background p-xs rounded">
                                     {'{ "type": "FULFILLMENT", "state": "VERIFYING", "match_id": "CB-842" }'}

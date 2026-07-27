@@ -14,7 +14,7 @@ export default function EvidenceSection() {
                 >
                     <h2 className="font-headline-lg text-headline-lg mb-md">Immutable Evidence</h2>
                     <p className="font-body-md text-body-md text-on-surface-variant">
-                        We don't just "read" your messages. We generate cryptographically verifiable proof of work and commitments to ensure absolute clarity across teams.
+                        We don&apos;t just &quot;read&quot; your messages. We generate cryptographically verifiable proof of work and commitments to ensure absolute clarity across teams.
                     </p>
                 </motion.div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-lg items-stretch">
@@ -30,7 +30,7 @@ export default function EvidenceSection() {
                         </div>
                         <div>
                             <h4 className="font-headline-md text-headline-md mb-xs">Audited Transactions</h4>
-                            <p className="text-on-surface-variant text-body-sm">Every change in a commitment's state is logged with a timestamp and the specific conversation excerpt that triggered it.</p>
+                            <p className="text-on-surface-variant text-body-sm">Every change in a commitment&apos;s state is logged with a timestamp and the specific conversation excerpt that triggered it.</p>
                         </div>
                     </motion.div>
                     <motion.div 

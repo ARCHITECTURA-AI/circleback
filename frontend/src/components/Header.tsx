@@ -5,6 +5,7 @@ export default function Header() {
         <header className="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
             <div className="flex justify-between items-center px-margin-desktop py-sm max-w-[1440px] mx-auto">
                 <div className="flex items-center gap-sm cursor-pointer active:scale-95 transition-transform">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img alt="Circle Back Logo" className="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsvXL0GTm0i5Bfly52RMPxR2PtnfxPRFzvmfyfmtu29DyooxZH68PclEYdzNcwlDY4d89Nwqom1F0kvWC_bw-EBPne5-nfe1vw7OoYK9R2YPFMtGFMv-4C4v7FUhZQjQ9Oof1zg73UjyEQy3d0yp0E2snz_PJwGZvjutyH8jaiWk2KpcPkSBBZ8cUT766E5V7hqZK_sxlgC1fy-8gGNDl8pZTvNkZsYAeBmUTQSO1QJhGd3kS2OP2j68Pyt" />
                     <span className="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Circle Back</span>
                 </div>
