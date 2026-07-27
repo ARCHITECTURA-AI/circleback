@@ -145,3 +145,148 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+
+/* STITCH STYLES */
+@theme inline {
+  --color-background: #13131b;
+  --color-error-container: #93000a;
+  --color-on-tertiary-fixed: #301400;
+  --color-on-secondary: #272377;
+  --color-tertiary-container: #d97721;
+  --color-on-tertiary: #4f2500;
+  --color-surface-container: #1f1f27;
+  --color-secondary-fixed-dim: #c3c0ff;
+  --color-on-tertiary-fixed-variant: #703700;
+  --color-inverse-surface: #e4e1ed;
+  --color-secondary-fixed: #e2dfff;
+  --color-on-surface: #e4e1ed;
+  --color-on-primary: #1000a9;
+  --color-surface-variant: #34343d;
+  --color-primary-fixed-dim: #c0c1ff;
+  --color-on-primary-container: #0d0096;
+  --color-surface-container-high: #292932;
+  --color-surface-tint: #c0c1ff;
+  --color-primary: #c0c1ff;
+  --color-surface-container-highest: #34343d;
+  --color-inverse-on-surface: #303038;
+  --color-tertiary-fixed-dim: #ffb783;
+  --color-secondary-container: #3e3c8f;
+  --color-secondary: #c3c0ff;
+  --color-surface-container-lowest: #0d0d15;
+  --color-on-primary-fixed-variant: #2f2ebe;
+  --color-on-secondary-container: #afadff;
+  --color-on-tertiary-container: #452000;
+  --color-tertiary-fixed: #ffdcc5;
+  --color-outline: #908fa0;
+  --color-on-error: #690005;
+  --color-inverse-primary: #494bd6;
+  --color-outline-variant: #464554;
+  --color-on-secondary-fixed-variant: #3e3c8f;
+  --color-surface-dim: #13131b;
+  --color-on-error-container: #ffdad6;
+  --color-surface-bright: #393841;
+  --color-on-surface-variant: #c7c4d7;
+  --color-error: #ffb4ab;
+  --color-surface: #13131b;
+  --color-primary-fixed: #e1e0ff;
+  --color-tertiary: #ffb783;
+  --color-primary-container: #8083ff;
+  --color-on-secondary-fixed: #100563;
+  --color-surface-container-low: #1b1b23;
+  --color-on-primary-fixed: #07006c;
+  --color-on-background: #e4e1ed;
+  --spacing-xs: 8px;
+  --spacing-margin-desktop: 32px;
+  --spacing-gutter: 20px;
+  --spacing-lg: 40px;
+  --spacing-xl: 64px;
+  --spacing-md: 24px;
+  --spacing-base: 4px;
+  --spacing-margin-mobile: 16px;
+  --spacing-sm: 16px;
+  --radius: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+  --font-headline-lg-mobile: "Inter";
+  --font-mono-code: "JetBrains Mono";
+  --font-mono-label: "JetBrains Mono";
+  --font-headline-md: "Inter";
+  --font-body-md: "Inter";
+  --font-headline-lg: "Inter";
+  --font-body-sm: "Inter";
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 1.2;
+  --text-headline-lg-mobile--font-weight: 700;
+  --text-mono-code: 13px;
+  --text-mono-code--line-height: 1.6;
+  --text-mono-code--font-weight: 400;
+  --text-mono-label: 12px;
+  --text-mono-label--line-height: 1;
+  --text-mono-label--font-weight: 500;
+  --text-mono-label--letter-spacing: 0.05em;
+  --text-headline-md: 20px;
+  --text-headline-md--line-height: 1.4;
+  --text-headline-md--font-weight: 600;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.5;
+  --text-body-sm--font-weight: 400;
+}
+
+        body {
+            background-color: #13131b;
+            color: #e4e1ed;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(70, 69, 84, 0.5);
+        }
+        .reveal-anim {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-anim.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .gradient-border-primary {
+            position: relative;
+            background: #13131b;
+            border-radius: 0.25rem;
+        }
+        .gradient-border-primary::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            background: linear-gradient(135deg, #6366f1, #c0c1ff);
+            z-index: -1;
+            border-radius: 0.3rem;
+        }
+        .status-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(192, 193, 255, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+    
